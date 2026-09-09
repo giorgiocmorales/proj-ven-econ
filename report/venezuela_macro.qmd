@@ -1,0 +1,195 @@
+---
+metadata-files:
+  - ../config/report.yml
+format:
+  pdf:
+    documentclass: article
+    mainfont: Arial
+    sansfont: Arial
+    fontsize: 11pt
+    geometry:
+      - margin=1in
+    keep-tex: true
+    fig-pos: H
+  docx:
+    reference-doc: templates/ema_reference.docx
+    toc: false
+    fig-dpi: 300
+execute:
+  echo: false
+  warning: false
+  message: false
+  fig-width: 6.5
+  fig-height: 2.7
+  fig-align: center
+editor: visual
+---
+
+```{r}
+#| label: setup
+
+# Windows hosts starting in the C locale need UTF-8 for Spanish chart labels and fonts.
+if (.Platform$OS.type == "windows" && !l10n_info()[["UTF-8"]]) {
+  if (!nzchar(Sys.setlocale("LC_CTYPE", ".UTF-8"))) {
+    stop("A UTF-8 locale is required to render the Spanish client report", call. = FALSE)
+  }
+}
+
+library(tidyverse)
+library(knitr)
+knitr::opts_chunk$set(dev = if (knitr::is_latex_output()) "cairo_pdf" else "ragg_png")
+
+source(here::here("R", "chart_theme.R"))
+source(here::here("R", "report_figures.R"), encoding = "UTF-8")
+source(here::here("R", "report_tables.R"))
+source(here::here("R", "data_contract_helpers.R"))
+source(here::here("R", "report_inputs.R"))
+params <- read_report_config(path = Sys.getenv("REPORT_CONFIG", here::here("config", "report.yml")))$params
+
+# Recheck source contracts when rendering directly, then apply this edition's windows.
+validate_report_sources(
+  registry_path = here::here("registry", "report_series.csv"),
+  contracts_path = here::here("registry", "data_contracts.csv"),
+  reference_date = as.Date(params$data_cutoff)
+)
+# Direct renders must not reuse a report layer older than its source inputs or mapping.
+report_registry <- readr::read_csv(here::here("registry", "report_series.csv"), show_col_types = FALSE)
+report_dependencies <- here::here(c(
+  unique(report_registry$source_file), "registry/report_series.csv", "scripts/report_01_data_layer.R"
+))
+report_layer_path <- here::here("data", "final", "report_series.csv")
+if (!file.exists(report_layer_path) || any(file.mtime(report_dependencies) > file.mtime(report_layer_path))) {
+  rlang::abort("Report layer is missing or older than its inputs. Run Rscript scripts/run_report.R", class = "report_cache_error")
+}
+report_inputs <- prepare_report_data(
+  data = read_report_series(report_layer_path),
+  settings = params,
+  registry_path = here::here("registry", "report_series.csv")
+)
+report_data <- report_inputs$data
+executive_table <- build_executive_table(
+  data = report_data,
+  first_year = params$summary_first_year,
+  last_year = params$summary_last_year
+) %>%
+  rename(Variable = .data$table_label)
+external_table <- build_external_table(
+  data = report_data,
+  first_year = params$summary_first_year,
+  last_year = params$summary_last_year
+)
+
+# Build each main graph once, using the same object for the document and PNG export.
+recent_data <- report_inputs$figures %>% filter(.data$date >= as.Date(params$recent_history_start))
+report_figures <- list(
+  growth = build_growth_figure(report_inputs$figures),
+  inflation = build_inflation_figure(recent_data),
+  fx = build_fx_figure(recent_data),
+  oil = build_oil_figure(report_inputs$figures),
+  external = build_external_figure(report_inputs$figures),
+  fiscal = build_fiscal_figure(report_inputs$figures)
+)
+dir.create(here::here("output", "figures"), recursive = TRUE, showWarnings = FALSE)
+dir.create(here::here("output", "reports"), recursive = TRUE, showWarnings = FALSE)
+iwalk(report_figures, function(figure, figure_id) {
+  ggsave(
+    filename = here::here("output", "figures", paste0("macro_", figure_id, ".png")),
+    plot = figure, width = 6.5, height = if (figure_id == "oil") 5.4 else 2.7, units = "in", dpi = 300,
+    device = ragg::agg_png, bg = "white"
+  )
+})
+readr::write_csv(report_inputs$coverage, here::here("output", "reports", "source_coverage.csv"))
+readr::write_csv(executive_table, here::here("output", "reports", "executive_table.csv"))
+```
+
+## Resumen ejecutivo
+
+::: {custom-style="Compact"}
+**Responsable:** Eco. Giorgio Cunto Morales
+
+**Cliente:** `r params$client` · **Corte de datos:** `r params$data_cutoff`
+:::
+
+**[Párrafo 1: actividad, inflación y tipo de cambio.]** Sintetizar los principales cambios del período y sus implicaciones para la operación del cliente. Destacar únicamente cifras verificadas y distinguir los datos observados de las estimaciones y perspectivas.
+
+**[Párrafo 2: petróleo, sector externo y situación fiscal.]** Integrar las condiciones de generación de divisas, ingresos públicos y riesgos relevantes. Cerrar con una valoración breve de las perspectivas y de las decisiones que estos resultados podrían afectar.
+
+**Consideraciones principales**
+
+- [Implicación para demanda, ventas y planificación comercial.]
+- [Implicación para costos, precios y disponibilidad de divisas.]
+- [Riesgo o condición que podría modificar el escenario.]
+
+{{< pagebreak >}}
+
+## Crecimiento y Producto Interno Bruto
+
+**[Análisis: uno o dos párrafos.]** Explicar el comportamiento del PIB, los principales motores y restricciones de la actividad y sus implicaciones para el cliente. Diferenciar el crecimiento publicado por el BCV de la referencia del FMI; añadir los supuestos de recuperación cuando esté disponible el módulo de escenarios.
+
+```{r}
+#| label: growth-figure
+
+report_figures$growth
+```
+
+**[Segundo gráfico pendiente: recuperación del PIB por habitante.]** Definir el nivel de referencia y las trayectorias de crecimiento antes de incorporar el panel de escenarios.
+
+{{< pagebreak >}}
+
+## Inflación y Tipo de Cambio
+
+**[Análisis: uno o dos párrafos.]** Relacionar la evolución del tipo de cambio oficial y alternativo con la inflación, la brecha cambiaria y las presiones sobre costos y precios. Separar los cambios mensuales de las variaciones interanuales y precisar el último período disponible para cada indicador.
+
+```{r}
+#| label: fx-figure
+
+report_figures$fx
+```
+
+```{r}
+#| label: inflation-figure
+
+report_figures$inflation
+```
+
+{{< pagebreak >}}
+
+## Precio y Producción Petrolera
+
+**[Análisis: uno o dos párrafos.]** Describir la producción y el precio del crudo, sus restricciones y la incidencia sobre la generación de divisas. Indicar que la producción corresponde a fuentes secundarias de la OPEP y que el precio disponible es el marcador Merey; agregar comparadores cuando las series estén verificadas.
+
+```{r}
+#| label: oil-figure
+#| fig-height: 5.4
+
+report_figures$oil
+```
+
+{{< pagebreak >}}
+
+## Sector Externo y Disponibilidad de Divisas
+
+**[Análisis: uno o dos párrafos.]** Explicar las exportaciones e importaciones de bienes y sus implicaciones para la disponibilidad de divisas. Incorporar las intervenciones cambiarias cuando se cuente con una serie verificable de montos; las fechas y tasas publicadas no equivalen a montos de intervención.
+
+```{r}
+#| label: external-figure
+
+report_figures$external
+```
+
+**[Segundo gráfico pendiente: intervenciones cambiarias mensuales.]** Completar la fuente y el contrato de datos de los montos antes de incluir este panel. El gráfico actual de comercio de bienes no distingue las exportaciones petroleras.
+
+{{< pagebreak >}}
+
+## Balance Fiscal y Recaudación Tributaria
+
+**[Análisis: uno o dos párrafos.]** Analizar el balance fiscal y la disponibilidad de ingresos públicos, diferenciando estimaciones de cifras oficiales. Integrar la recaudación del SENIAT y sus equivalentes en dólares una vez verificadas la fuente, la frecuencia y las tasas de conversión.
+
+```{r}
+#| label: fiscal-figure
+
+report_figures$fiscal
+```
+
+**[Segundo gráfico pendiente: recaudación tributaria.]** Completar la serie del SENIAT y la comparación al tipo de cambio oficial y alternativo antes de incorporar el panel.
+

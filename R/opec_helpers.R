@@ -103,10 +103,27 @@ opec_period_type <- function(period) {
 }
 
 extract_opec_venezuela_line <- function(text, source_type, observation_month = NULL) {
+  # Select the requested table explicitly; never reuse a secondary row as direct data.
+  source_heading <- switch(source_type,
+    secondary_sources = "secondary sources",
+    direct_communication = "direct communication",
+    stop(sprintf("Unknown production source: %s", source_type))
+  )
+  heading <- stringr::str_locate(text, stringr::regex(
+    paste0("Table[^\\n]*crude oil production[^\\n]*", source_heading), ignore_case = TRUE
+  ))
+  if (is.na(heading[1, 1])) {
+    stop(sprintf("Missing production table heading for %s", source_type))
+  }
+  text <- stringr::str_sub(text, heading[1, 2] + 1L)
+  next_table <- stringr::str_locate(text, "Table [0-9]")
+  if (!is.na(next_table[1, 1])) {
+    text <- stringr::str_sub(text, 1L, next_table[1, 1] - 1L)
+  }
   pattern <- "Venezuela\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+(-?[0-9,.]+|\\.\\.)"
   matches <- stringr::str_match_all(text, pattern)[[1]]
 
-  if (nrow(matches) == 0) {
+  if (nrow(matches) != 1) {
     stop(sprintf("Could not find Venezuela production row for %s", source_type))
   }
 

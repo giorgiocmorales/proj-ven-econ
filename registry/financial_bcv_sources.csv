@@ -1,0 +1,15 @@
+dataset_family,parser_profile,frequency,source_url,raw_file,vintage_label,priority,unit_profile
+balances,balances_weekly,weekly,https://bcv.org.ve/sites/default/files/1_2_9.xlsx,data/raw/financial_balances_w_current.xlsx,current,4,ves_current
+balances,balances_weekly,weekly,https://bcv.org.ve/sites/default/files/1_2_9-.xlsx,data/raw/financial_balances_w_2018_2021.xlsx,2018_2021,3,ves2018_thousand
+balances,balances_weekly,weekly,https://bcv.org.ve/sites/default/files/1_2_9.xls,data/raw/financial_balances_w_2008_2018.xls,2008_2018,2,vef_thousand
+balances,balances_weekly,weekly,https://bcv.org.ve/sites/default/files/1_2_9s.xls,data/raw/financial_balances_w_1998_2007.xls,1998_2007,1,veb_million
+reserve_coefficients,reserve_coefficients_monthly,monthly,https://bcv.org.ve/sites/default/files/1_3_36.xls,data/raw/financial_reserve_coefficients_m.xls,full_history,1,percent
+reserve_positions,reserve_positions_weekly_current,weekly,https://bcv.org.ve/sites/default/files/1_2_10.xlsx,data/raw/financial_reserve_position_w_current.xlsx,current,4,ves_current
+reserve_positions,reserve_positions_weekly_current,weekly,https://bcv.org.ve/sites/default/files/1_2_10_s_2018-2021.xlsx,data/raw/financial_reserve_position_w_2018_2021.xlsx,2018_2021,3,ves2018_thousand
+reserve_positions,reserve_positions_weekly_dual,weekly,https://bcv.org.ve/sites/default/files/1_2_10.xls,data/raw/financial_reserve_position_w_2008_2018.xls,2008_2018,2,vef_thousand_usd_thousand
+reserve_positions,reserve_positions_weekly_dual,weekly,https://bcv.org.ve/sites/default/files/1_2_10s_1.xls,data/raw/financial_reserve_position_w_1998_2007.xls,1998_2007,1,veb_million_usd_thousand
+reserve_positions,reserve_positions_monthly_current,monthly,https://bcv.org.ve/sites/default/files/1_3_23.xls,data/raw/financial_reserve_position_m_current.xls,current,5,ves_current
+reserve_positions,reserve_positions_monthly_current,monthly,https://bcv.org.ve/sites/default/files/1_3_23_s_2018-2021_6.xls,data/raw/financial_reserve_position_m_2018_2021.xls,2018_2021,4,ves2018_thousand
+reserve_positions,reserve_positions_monthly_current,monthly,https://bcv.org.ve/sites/default/files/1_3_23_0.xlsx,data/raw/financial_reserve_position_m_2012_2018.xlsx,2012_2018,3,vef_thousand
+reserve_positions,reserve_positions_monthly_historical,monthly,https://bcv.org.ve/sites/default/files/1_3_23s1.xls,data/raw/financial_reserve_position_m_2008_2011.xls,2008_2011,2,vef_thousand
+reserve_positions,reserve_positions_monthly_dual,monthly,https://bcv.org.ve/sites/default/files/1_3_23s.xls,data/raw/financial_reserve_position_m_2004_2007.xls,2004_2007,1,veb_million_usd_thousand

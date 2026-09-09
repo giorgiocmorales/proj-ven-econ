@@ -41,8 +41,6 @@ bcv_fx_smc <- read_csv(resolve_input_path(
                          currency = col_character(),
                          bid = col_double(),
                          ask = col_double(),
-                         usd_bid = col_double(),
-                         usd_ask = col_double(),
                          database_id = col_character()
                          ))
 
@@ -76,15 +74,24 @@ bcv_fx_smc <- bcv_fx_smc %>%
   ) %>%
   filter(currency == "USD") %>%
   rename(date = fecha_valor) %>%
-  select(date, rate_smc)
+  select(date, rate_smc) %>%
+  filter(!is.na(date)) %>%
+  arrange(date) %>%
+  distinct(date, .keep_all = TRUE)
 
 bcv_fx_indx <- bcv_fx_indx %>%
   rename(date = fecha, rate_indx = tasa) %>%
-  select(date, rate_indx)
+  select(date, rate_indx) %>%
+  filter(!is.na(date)) %>%
+  arrange(date) %>%
+  distinct(date, .keep_all = TRUE)
 
 ves_fx_yad <- ves_fx_yad %>%
   rename(date = date, rate_yad = implicit_rate) %>%
-  select(date, rate_yad)
+  select(date, rate_yad) %>%
+  filter(!is.na(date)) %>%
+  arrange(date) %>%
+  distinct(date, .keep_all = TRUE)
 
 # Set combination date range -------------
 min_date <- min(bcv_fx_smc$date, bcv_fx_indx$date, ves_fx_yad$date, na.rm = TRUE)
@@ -100,7 +107,13 @@ fx_combined <- full_join(full_date_range, bcv_fx_smc, by = "date") %>%
 # Fill NAs down -------------
 fx_combined <- fx_combined %>%
   arrange(date) %>%
-  fill(rate_smc, rate_indx, rate_yad)
+  fill(rate_smc, rate_indx, rate_yad) %>%
+  # Do not extend a stopped source to another source's latest observation date.
+  mutate(
+    rate_smc = if_else(date > max(bcv_fx_smc$date), NA_real_, rate_smc),
+    rate_indx = if_else(date > max(bcv_fx_indx$date), NA_real_, rate_indx),
+    rate_yad = if_else(date > max(ves_fx_yad$date), NA_real_, rate_yad)
+  )
 
 # Correct for currency reconversions -------------
 fx_combined <- fx_combined %>%
@@ -113,18 +126,8 @@ fx_combined <- fx_combined %>%
 # Save ----------------
 output_path <- "data/final/external_fx.csv"
 
-tryCatch(
-  write_csv(fx_combined, output_path),
-  error = function(e) {
-    fallback_path <- "data/final/external_fx_rebuild.csv"
-    warning(sprintf(
-      "Could not overwrite %s. Wrote rebuild output to %s instead.",
-      output_path,
-      fallback_path
-    ))
-    write_csv(fx_combined, fallback_path)
-  }
-)
+# A failed write must stop downstream reporting from reading an older file.
+write_csv(fx_combined, output_path)
 
 # Clean up
 rm(

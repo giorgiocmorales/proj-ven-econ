@@ -4,10 +4,7 @@
 library(tidyverse)
 library(readxl)
 library(lubridate)
-library(openxlsx)
 library(glue)
-
-source("R/source_helpers.R")
 
 # Clean up ----
 rm(list = ls())
@@ -16,6 +13,7 @@ rm(list = ls())
 
 # Ensure required folders exist
 source("R/source_helpers.R")
+source("R/smc_manual_helpers.R")
 ensure_project_dirs()
 
 # Normalize text to reduce encoding/accent fragility in pattern matching
@@ -202,30 +200,30 @@ process_fixed_file <- function(filepath, database_id) {
   return(df)
 }
 
-manual_fix_files <- tribble(
-  ~filepath, ~database_id,
-  "data/manual_fix/2_1_2d21_smc.xlsx", "2021Q4",
-  "data/manual_fix/2_1_2c22_smc.xlsx", "2022Q3",
-  "data/manual_fix/2_1_2d22_smc.xlsx", "2022Q4",
-  "data/manual_fix/2_1_2a23_smc.xlsx", "2023Q1",
-  "data/manual_fix/2_1_2b23_smc.xlsx", "2023Q2",
-  "data/manual_fix/2_1_2c23_smc_60.xlsx", "2023Q3"
-)
+manual_fix_files <- smc_manual_fix_registry()
+converter_path <- "scripts/convert_smc_manual_workbooks.ps1"
+manual_fix_ids <- character()
 
 # Build history only when no processed dataset exists. Normal runs skip this
 # block and refresh the current/incomplete quarter below.
 processed_path <- "data/processed/external_01_fx_smc_bcv.csv"
 staging_path <- sub("[.]csv$", ".building.csv", processed_path)
-full_rebuild <- !file.exists(processed_path)
-completed_ids <- character()
+existing_smc <- if (file.exists(processed_path)) {
+  read_csv(processed_path, show_col_types = FALSE)
+} else {
+  tibble()
+}
+completed_ids <- unique(existing_smc$database_id)
+missing_database_ids <- setdiff(bcv_files$database_id, completed_ids)
+full_rebuild <- !file.exists(processed_path) || length(missing_database_ids) > 0
 
 if (full_rebuild) {
   if (file.exists(staging_path)) {
     message(glue("Resuming SMC historical build from {staging_path}"))
     ves_fx_bcv <- read_csv(staging_path, show_col_types = FALSE)
   } else {
-    message("Processed SMC history not found: starting full historical build")
-    ves_fx_bcv <- tibble()
+    message("Starting or completing SMC historical build")
+    ves_fx_bcv <- existing_smc
   }
 
   completed_ids <- unique(ves_fx_bcv$database_id)
@@ -244,6 +242,14 @@ if (full_rebuild) {
       completed_ids <- c(completed_ids, bcv_files$database_id[i])
       write_csv(ves_fx_bcv, staging_path)
     }
+  }
+
+  manual_fix_ids <- setdiff(manual_fix_files$database_id, completed_ids)
+  if (length(manual_fix_ids) > 0) {
+    prepare_smc_manual_workbooks(
+      manual_fixes = manual_fix_files %>% filter(database_id %in% manual_fix_ids),
+      converter_path = converter_path
+    )
   }
 
   for (i in seq_len(nrow(manual_fix_files))) {
@@ -268,6 +274,14 @@ if (full_rebuild) {
 
   if (nrow(ves_fx_bcv) == 0) {
     stop("Full SMC build produced no observations")
+  }
+
+  missing_database_ids <- setdiff(bcv_files$database_id, unique(ves_fx_bcv$database_id))
+  if (length(missing_database_ids) > 0) {
+    stop(glue(
+      "SMC historical build is incomplete. Missing database IDs: ",
+      "{paste(missing_database_ids, collapse = ', ')}"
+    ))
   }
 
   ves_fx_bcv <- ves_fx_bcv %>%
@@ -308,7 +322,13 @@ if (!full_rebuild) {
 }
 
 # Check no repeats -----------
-nrow(distinct(ves_fx_bcv, fecha_valor, currency)) == nrow(ves_fx_bcv)
+duplicate_keys <- ves_fx_bcv %>%
+  count(fecha_valor, currency) %>%
+  filter(n > 1)
+
+if (nrow(duplicate_keys) > 0) {
+  stop(glue("SMC output contains {nrow(duplicate_keys)} duplicate date/currency keys"))
+}
 
 # Save -------------
 write_csv(ves_fx_bcv, processed_path)
@@ -317,7 +337,9 @@ write_csv(ves_fx_bcv, processed_path)
 rm(
   fx_data, ves_fx_bcv, database_id, url, current_file, bcv_files,
   manual_fix_files, processed_path, full_rebuild,
-  staging_path, completed_ids,
+  staging_path, existing_smc, completed_ids, missing_database_ids,
+  duplicate_keys, converter_path, manual_fix_ids,
   download_bcv_file, extract_fx_from_file, extract_fx_from_sheet,
-  process_bcv_file, process_fixed_file, normalize_text, extract_date_from_text
+  process_bcv_file, process_fixed_file, normalize_text, extract_date_from_text,
+  smc_manual_fix_registry, convert_smc_manual_workbook, prepare_smc_manual_workbooks
 )

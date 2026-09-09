@@ -1,0 +1,7 @@
+# Keep report rendering and generated resources inside the repository project.
+project:
+  type: default
+  render:
+    - report/venezuela_macro.qmd
+  output-dir: output/reports
+  execute-dir: project

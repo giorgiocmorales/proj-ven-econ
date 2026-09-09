@@ -1,0 +1,80 @@
+domain,source_label,series_id,display_label,entity_type
+production,Algeria,algeria,Algeria,country
+production,Angola,angola,Angola,country
+production,Azerbaijan,azerbaijan,Azerbaijan,country
+production,Bahrain,bahrain,Bahrain,country
+production,Brunei,brunei,Brunei,country
+production,Congo,congo,Congo,country
+production,Ecuador,ecuador,Ecuador,country
+production,Equatorial Guinea,equatorial_guinea,Equatorial Guinea,country
+production,Gabon,gabon,Gabon,country
+production,Indonesia,indonesia,Indonesia,country
+production,Iran,iran,Iran,country
+production,Iraq,iraq,Iraq,country
+production,Kazakhstan,kazakhstan,Kazakhstan,country
+production,Kuwait,kuwait,Kuwait,country
+production,Libya,libya,Libya,country
+production,Malaysia,malaysia,Malaysia,country
+production,Mexico,mexico,Mexico,country
+production,Nigeria,nigeria,Nigeria,country
+production,Oman,oman,Oman,country
+production,Qatar,qatar,Qatar,country
+production,Russia,russia,Russia,country
+production,Saudi Arabia,saudi_arabia,Saudi Arabia,country
+production,South Sudan,south_sudan,South Sudan,country
+production,Sudan,sudan,Sudan,country
+production,United Arab Emirates,united_arab_emirates,United Arab Emirates,country
+production,Venezuela,venezuela,Venezuela,country
+production,Total OPEC,total_opec,Total OPEC,aggregate
+production,OPEC-10,opec_10,OPEC-10,aggregate
+production,OPEC excl. Iraq,opec_excl_iraq,OPEC excl. Iraq,aggregate
+production,Total Non-OPEC DoC,total_non_opec_doc,Total Non-OPEC DoC,aggregate
+production,Total DoC,total_doc,Total DoC,aggregate
+price,Arab Light,arab_light,Arab Light,benchmark
+price,Basrah Light,basrah_light,Basrah Light,benchmark
+price,Basrah Medium,basrah_medium,Basrah Medium,benchmark
+price,BCF-17,bcf_17,BCF-17,benchmark
+price,Bonny Light,bonny_light,Bonny Light,benchmark
+price,Brent,brent,Brent,benchmark
+price,Djeno,djeno,Djeno,benchmark
+price,Dubai,dubai,Dubai,benchmark
+price,Es Sider,es_sider,Es Sider,benchmark
+price,Girassol,girassol,Girassol,benchmark
+price,Iran Heavy,iran_heavy,Iran Heavy,benchmark
+price,Isthmus,isthmus,Isthmus,benchmark
+price,Kuwait Export,kuwait_export,Kuwait Export,benchmark
+price,LLS,lls,LLS,benchmark
+price,Marine,marine,Marine,benchmark
+price,Mars,mars,Mars,benchmark
+price,Merey,merey,Merey,benchmark
+price,Minas,minas,Minas,benchmark
+price,Murban,murban,Murban,benchmark
+price,Oriente,oriente,Oriente,benchmark
+price,Rabi Light,rabi_light,Rabi Light,benchmark
+price,Sahara Blend,sahara_blend,Sahara Blend,benchmark
+price,Tapis,tapis,Tapis,benchmark
+price,Tia Juana Light,tia_juana_light,Tia Juana Light,benchmark
+price,Urals,urals,Urals,benchmark
+price,WTI,wti,WTI,benchmark
+price,Zafiro,zafiro,Zafiro,benchmark
+price,ORB,orb,ORB,benchmark
+production,IR Iran,iran,Iran,country
+production,"Iran, I.R.",iran,Iran,country
+production,SP Libyan AJ,libya,Libya,country
+production,"Libya, S.P.A.J.",libya,Libya,country
+production,UAE,united_arab_emirates,United Arab Emirates,country
+production,Guinea,equatorial_guinea,Equatorial Guinea,country
+price,Arabian Light,arab_light,Arab Light,benchmark
+price,Dated Brent,brent,Brent,benchmark
+price,North Sea Dated,brent,Brent,benchmark
+price,Saharan Blend,sahara_blend,Sahara Blend,benchmark
+price,Qatar Marine,marine,Marine,benchmark
+price,T.J. Light,tia_juana_light,Tia Juana Light,benchmark
+price,W Texas Intermediate,wti,WTI,benchmark
+price,West Texas Intermediate,wti,WTI,benchmark
+price,Basket,orb,ORB,benchmark
+price,Reference Basket,orb,ORB,benchmark
+price,OPEC Reference Basket,orb,ORB,benchmark
+price,OPEC Reference,orb,ORB,benchmark
+price,W Texas,wti,WTI,benchmark
+price,Cabinda,cabinda,Cabinda,benchmark

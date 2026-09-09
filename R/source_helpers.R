@@ -1,6 +1,7 @@
 ensure_project_dirs <- function() {
   dirs <- c(
     "data/raw",
+    "data/interim",
     "data/processed",
     "data/final",
     "data/manual_fix",
@@ -17,43 +18,88 @@ ensure_project_dirs <- function() {
 download_latest_file <- function(url, dest_path, max_attempts = 3, timeout_seconds = 120) {
   ensure_project_dirs()
 
+  dest_dir <- dirname(dest_path)
+  dir.create(dest_dir, recursive = TRUE, showWarnings = FALSE)
+
   timeout_old <- getOption("timeout")
   on.exit(options(timeout = timeout_old), add = TRUE)
   options(timeout = timeout_seconds)
 
-  if (file.exists(dest_path)) {
-    unlink(dest_path)
-  }
+  download_path <- tempfile(
+    pattern = paste0(".", basename(dest_path), "_"),
+    tmpdir = dest_dir,
+    fileext = ".download"
+  )
+  backup_path <- tempfile(
+    pattern = paste0(".", basename(dest_path), "_"),
+    tmpdir = dest_dir,
+    fileext = ".backup"
+  )
+  on.exit(unlink(download_path), add = TRUE)
+  on.exit(unlink(backup_path), add = TRUE)
+
+  last_error <- NULL
 
   for (attempt in seq_len(max_attempts)) {
     ok <- tryCatch(
       {
-        download.file(
+        download_status <- download.file(
           url = url,
-          destfile = dest_path,
+          destfile = download_path,
           mode = "wb",
           quiet = TRUE,
           method = "libcurl"
         )
+
+        if (download_status != 0) {
+          stop(sprintf("Download returned status %s", download_status))
+        }
+
         TRUE
       },
-      error = function(e) FALSE
+      error = function(e) {
+        last_error <<- conditionMessage(e)
+        FALSE
+      }
     )
 
-    if (ok && file.exists(dest_path) && file.info(dest_path)$size > 0) {
+    if (ok && file.exists(download_path) && file.info(download_path)$size > 0) {
+      if (file.exists(dest_path) && !file.rename(dest_path, backup_path)) {
+        stop(sprintf("Could not preserve existing file before refresh: %s", dest_path), call. = FALSE)
+      }
+
+      if (!file.rename(download_path, dest_path)) {
+        if (file.exists(backup_path) && !file.rename(backup_path, dest_path)) {
+          stop(sprintf("Could not restore existing file after refresh failure: %s", dest_path), call. = FALSE)
+        }
+
+        stop(sprintf("Could not promote refreshed download: %s", dest_path), call. = FALSE)
+      }
+
+      if (file.exists(backup_path)) {
+        unlink(backup_path)
+      }
+
       return(dest_path)
     }
 
-    if (file.exists(dest_path)) {
-      unlink(dest_path)
-    }
+    last_error <- "Downloaded file is empty"
+    unlink(download_path)
 
     if (attempt < max_attempts) {
       Sys.sleep(1.5 * attempt)
     }
   }
 
-  stop(sprintf("Download failed after %s attempts: %s", max_attempts, basename(dest_path)))
+  stop(
+    sprintf(
+      "Download failed after %s attempts: %s. Last error: %s",
+      max_attempts,
+      basename(dest_path),
+      last_error
+    ),
+    call. = FALSE
+  )
 }
 
 stack_excel_workbook <- function(file_path) {
@@ -138,6 +184,23 @@ parse_bcv_date <- function(x) {
   x_chr <- stringr::str_remove_all(x_chr, "\\(\\*\\)|\\*")
   x_chr <- stringr::str_replace_all(x_chr, "/+", "/")
   x_chr <- stringr::str_trim(x_chr)
+
+  # Normalize Spanish month names because the runtime locale may not parse them.
+  spanish_month_patterns <- c(
+    "(?i)\\bene(?:ro)?\\b" = "01",
+    "(?i)\\bfeb(?:rero)?\\b" = "02",
+    "(?i)\\bmar(?:zo)?\\b" = "03",
+    "(?i)\\babr(?:il)?\\b" = "04",
+    "(?i)\\bmay(?:o)?\\b" = "05",
+    "(?i)\\bjun(?:io)?\\b" = "06",
+    "(?i)\\bjul(?:io)?\\b" = "07",
+    "(?i)\\bago(?:sto)?\\b" = "08",
+    "(?i)\\b(?:sep|set)(?:tiembre)?\\b" = "09",
+    "(?i)\\boct(?:ubre)?\\b" = "10",
+    "(?i)\\bnov(?:iembre)?\\b" = "11",
+    "(?i)\\bdic(?:iembre)?\\b" = "12"
+  )
+  x_chr <- stringr::str_replace_all(x_chr, spanish_month_patterns)
 
   serial <- suppressWarnings(as.numeric(x_chr))
   serial_date <- as.Date(serial, origin = "1899-12-30")
@@ -246,6 +309,13 @@ extract_matching_sheets_from_workbook <- function(file_path, patterns) {
 write_processed_dataset <- function(df, dataset_id) {
   ensure_project_dirs()
   out_path <- file.path("data", "processed", paste0(dataset_id, ".csv"))
+  readr::write_csv(df, out_path)
+  invisible(out_path)
+}
+
+write_interim_dataset <- function(df, dataset_id) {
+  ensure_project_dirs()
+  out_path <- file.path("data", "interim", paste0(dataset_id, ".csv"))
   readr::write_csv(df, out_path)
   invisible(out_path)
 }
