@@ -6,6 +6,7 @@ params:
   client: "Coca-Cola"
   data_cutoff: "2026-09-07"
   history_start: "2019-01-01"
+  fiscal_history_start: "1999-01-01"
   recent_history_start: "2022-01-01"
   summary_first_year: 2021
   summary_last_year: 2025

@@ -72,7 +72,13 @@ production_figure <- production %>%
   geom_line(linewidth = 0.7, linetype = "solid") +
   scale_color_manual(values = unname(report_palette[c("navy", "red")])) +
   scale_x_date(breaks = seq(as.Date("2000-01-01"), max(production$date), by = "5 years"), date_labels = "%Y") +
-  scale_y_continuous(labels = scales::label_number(big.mark = ".", decimal.mark = ",")) +
+  geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
+  scale_y_continuous(
+    labels = scales::label_number(big.mark = ".", decimal.mark = ","),
+    limits = ~range(pretty(c(.x, 0), n = 7)),
+    breaks = ~sort(unique(c(.x, pretty(.x, n = 7)))),
+    expand = expansion(mult = 0)
+  ) +
   labs(title = "Venezuela: producci\u00f3n de petr\u00f3leo",
        subtitle = paste0("Miles de barriles diarios | ", format(min(production$date), "%m/%Y"),
                          "\u2013", format(max(production$date), "%m/%Y")),
@@ -86,7 +92,13 @@ prices_figure <- prices %>%
   geom_line(linewidth = 0.7, linetype = "solid") +
   scale_color_manual(values = unname(report_palette[c("navy", "red", "cyan")])) +
   scale_x_date(breaks = seq(as.Date("2000-01-01"), max(prices$date), by = "5 years"), date_labels = "%Y") +
-  scale_y_continuous(labels = scales::label_number(big.mark = ".", decimal.mark = ",")) +
+  geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
+  scale_y_continuous(
+    labels = scales::label_number(big.mark = ".", decimal.mark = ","),
+    limits = ~range(pretty(c(.x, 0), n = 7)),
+    breaks = ~sort(unique(c(.x, pretty(.x, n = 7)))),
+    expand = expansion(mult = 0)
+  ) +
   labs(title = "Precios del petr\u00f3leo: WTI, Brent y Merey",
        subtitle = paste0("Promedios mensuales, USD por barril | ", format(min(prices$date), "%m/%Y"),
                          "\u2013", format(max(prices$date), "%m/%Y")),

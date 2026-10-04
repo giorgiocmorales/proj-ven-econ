@@ -23,13 +23,17 @@ report_chart_theme <- theme_minimal(base_family = "serif", base_size = 10) +
                                 lineheight = 1.15, margin = margin(t = 6)),
     axis.text = element_text(size = 8, color = "#2b3033"),
     axis.title = element_text(size = 9),
-    axis.line = element_line(color = "#2b3033", linewidth = 0.35),
+    axis.line.x = element_line(color = "#2b3033", linewidth = 0.35, linetype = "solid"),
+    axis.line.y = element_line(color = "#2b3033", linewidth = 0.35, linetype = "solid"),
+    axis.ticks = element_blank(),
+    axis.ticks.length = grid::unit(0, "pt"),
     panel.grid.major.x = element_blank(),
     panel.grid.minor = element_blank(),
     panel.grid.major.y = element_line(color = "#d6dde2", linewidth = 0.3),
     strip.text = element_text(size = 9, hjust = 0),
     legend.position = "bottom",
     legend.direction = "horizontal",
+    legend.box = "horizontal",
     legend.title = element_blank(),
     legend.text = element_text(size = 8.5),
     legend.key.width = grid::unit(1.1, "lines"),
@@ -104,12 +108,18 @@ build_growth_figure <- function(data) {
     ))
 
   ggplot(growth_data, aes(x = .data$date, y = .data$value, color = .data$series, linetype = .data$series)) +
-    geom_hline(yintercept = 0, color = "#2b3033", linewidth = 0.35) +
+
     geom_line(linewidth = 0.7) +
     geom_point(size = 1.6) +
     scale_color_manual(values = c("BCV observado" = report_palette[["navy"]], "FMI referencia" = report_palette[["red"]])) +
     scale_linetype_manual(values = c("BCV observado" = "solid", "FMI referencia" = "dashed")) +
-    scale_y_continuous(labels = scales::label_number(suffix = "%", big.mark = ".", decimal.mark = ",")) +
+    geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
+    scale_y_continuous(
+      labels = scales::label_number(suffix = "%", big.mark = ".", decimal.mark = ","),
+      limits = ~range(scales::breaks_width(5)(range(c(.x, 0)))),
+      breaks = scales::breaks_width(5),
+      expand = expansion(mult = 0)
+    ) +
     scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
     labs(
       title = "Crecimiento real del PIB",
@@ -145,7 +155,13 @@ build_inflation_figure <- function(data) {
       "Inflaci\u00f3n mensual" = "dashed"
     )) +
     facet_wrap(~series, scales = "free_y", ncol = 2) +
-    scale_y_continuous(labels = scales::label_number(suffix = "%", big.mark = ".", decimal.mark = ",")) +
+    geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
+    scale_y_continuous(
+      labels = scales::label_number(suffix = "%", big.mark = ".", decimal.mark = ","),
+      limits = ~range(pretty(c(.x, 0), n = 7)),
+      breaks = ~sort(unique(c(.x, pretty(.x, n = 7)))),
+      expand = expansion(mult = 0)
+    ) +
     scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
     labs(
       title = "Inflaci\u00f3n",
@@ -174,7 +190,13 @@ build_fx_figure <- function(data) {
     geom_line(linewidth = 0.7) +
     scale_color_manual(values = c("TC oficial" = report_palette[["navy"]], "TC alternativo" = report_palette[["red"]])) +
     scale_linetype_manual(values = c("TC oficial" = "solid", "TC alternativo" = "dashed")) +
-    scale_y_continuous(labels = scales::label_number(big.mark = ".", decimal.mark = ",")) +
+    geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
+    scale_y_continuous(
+      labels = scales::label_number(big.mark = ".", decimal.mark = ","),
+      limits = ~range(pretty(c(.x, 0), n = 7)),
+      breaks = ~sort(unique(c(.x, pretty(.x, n = 7)))),
+      expand = expansion(mult = 0)
+    ) +
     scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
     labs(
       title = "Tipo de cambio",
@@ -199,7 +221,13 @@ build_external_figure <- function(data) {
   ggplot(external_data, aes(x = factor(lubridate::year(.data$date)), y = .data$value / 1000, fill = .data$series)) +
     geom_col(position = "dodge", width = 0.7) +
     scale_fill_manual(values = c("Exportaciones" = report_palette[["navy"]], "Importaciones" = report_palette[["red"]])) +
-    scale_y_continuous(labels = scales::label_number(big.mark = ".", decimal.mark = ","), expand = expansion(mult = c(0, 0.08))) +
+    geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
+    scale_y_continuous(
+      labels = scales::label_number(big.mark = ".", decimal.mark = ","),
+      limits = ~range(pretty(c(.x, 0), n = 7)),
+      breaks = ~sort(unique(c(.x, pretty(.x, n = 7)))),
+      expand = expansion(mult = 0)
+    ) +
     labs(
       title = "Comercio exterior de bienes",
       subtitle = "Exportaciones e importaciones anuales, f.o.b.",
@@ -231,7 +259,13 @@ build_oil_figure <- function(data) {
       "Precio Merey (USD por barril)" = report_palette[["red"]]
     )) +
     scale_x_date(date_breaks = "3 months", date_labels = "%m/%Y") +
-    scale_y_continuous(labels = scales::label_number(big.mark = ".", decimal.mark = ",")) +
+    geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
+    scale_y_continuous(
+      labels = scales::label_number(big.mark = ".", decimal.mark = ","),
+      limits = ~range(pretty(c(.x, 0), n = 7)),
+      breaks = ~sort(unique(c(.x, pretty(.x, n = 7)))),
+      expand = expansion(mult = 0)
+    ) +
     labs(
       title = "Producci\u00f3n petrolera y precio del crudo",
       subtitle = "Observaciones mensuales; escalas independientes",
@@ -251,9 +285,15 @@ build_fiscal_figure <- function(data) {
   )
 
   ggplot(fiscal_data, aes(x = .data$date, y = .data$value)) +
-    geom_hline(yintercept = 0, color = "#2b3033", linewidth = 0.35) +
+
     geom_col(fill = report_palette[["navy"]], width = 240) +
-    scale_y_continuous(labels = scales::label_number(suffix = "%", big.mark = ".", decimal.mark = ",")) +
+    geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
+    scale_y_continuous(
+      labels = scales::label_number(suffix = "%", big.mark = ".", decimal.mark = ","),
+      limits = ~range(pretty(c(.x, 0), n = 7)),
+      breaks = ~sort(unique(c(.x, pretty(.x, n = 7)))),
+      expand = expansion(mult = 0)
+    ) +
     scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
     labs(
       title = "Balance fiscal del gobierno general",

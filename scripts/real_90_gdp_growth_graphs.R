@@ -55,16 +55,18 @@ gdp_growth <- gdp_growth %>%
 gdp_growth_figure <- gdp_growth %>%
   ggplot(aes(x = .data$year, y = .data$growth, fill = .data$phase)) +
   geom_col(width = 0.72) +
-  geom_hline(yintercept = 0, color = "#2b3033", linewidth = 0.35) +
+
   scale_fill_manual(values = c(
     "Expansi\u00f3n" = report_palette[["navy"]],
     "Recesi\u00f3n" = report_palette[["red"]], "Sin variaci\u00f3n" = "#b8c1c8"
   )) +
   scale_x_continuous(breaks = 1999:2025, expand = expansion(add = 0.7)) +
+  geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
   scale_y_continuous(
-    breaks = scales::breaks_width(10),
     labels = scales::label_number(suffix = "%", big.mark = ".", decimal.mark = ","),
-    expand = expansion(mult = c(0.04, 0.06))
+    limits = ~range(pretty(c(.x, 0), n = 7)),
+    breaks = ~sort(unique(c(.x, pretty(.x, n = 7)))),
+    expand = expansion(mult = 0)
   ) +
   labs(
     title = "Venezuela: crecimiento anual del PIB real",

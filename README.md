@@ -39,20 +39,31 @@ source("scripts/install_dependencies.R")
 
 - `scripts/run_prices.R`
 - `scripts/run_monetary.R`
+- `scripts/monetary_92_aggregates_graphs.R`: creates standalone weekly monetary-base/liquidity charts from 2020, retaining original observation dates and annual x-axis labels. Real levels use estimated daily headline CPI on each observation date, allocating published monthly inflation by constant daily compounding; the reference is the latest common observation's month. Nominal growth compares against 364 days earlier, using a preceding source observation within seven days only when the exact date is absent. Uses grouped headline CPI when available, otherwise the original headline extract, and the configured report cutoff. Saves exact data in `data/final/monetary_92_aggregates.csv`, weekly coverage in `data/final/monetary_92_weekly_coverage.csv`, and PNG/PDF in `outputs/figures/`.
 - `scripts/run_financial.R`
 - `scripts/run_oil.R`
 - `scripts/run_external.R`
+- `scripts/external_99_fx_report_graphs.R`: after FX consolidation, exports standalone official/unofficial daily rates and the percentage gap with a trailing 30-calendar-day average, using the approved report theme. Reads the recent-history window and cutoff from `config/report.yml` (or `REPORT_CONFIG`). Saves PNG/PDF charts under `outputs/figures/` and plotted values/coverage under `data/final/external_99_fx_graph*.csv`. The average requires 30 finite daily values and uses the consolidated pipeline's carried-forward rates.
 - `scripts/external_96_bop_goods.R`: creates report-ready annual and quarterly BCV goods exports and imports, with import magnitudes shown as positive values.
 - `scripts/run_real.R`
+- `scripts/real_91_gdp_quarterly_graphs.R`: exports standardized BCV quarterly year-over-year GDP growth bars (full history and 2019 onward) to PNG/PDF in `outputs/figures/`. Run after the quarterly GDP downloader. If the annual chart data from `scripts/real_90_gdp_growth_graphs.R` exists, also exports a side-by-side annual/quarterly comparison with a shared percentage scale. Exact plotted observations are retained in `data/final/real_91_gdp_*graph.csv`; internal quarterly gaps stop generation.
 - `scripts/run_fiscal.R`
+- `scripts/fiscal_05_components_imf.R`: downloads IMF WEO general-government revenue, expenditure, and net lending/borrowing as percentages of GDP together; failures preserve the existing extract.
+- `scripts/fiscal_90_balance_graph.R`: validates the three IMF fiscal components and exports annual revenue as positive navy bars, expenditure as negative red bars, and balance as a yellow line. Uses the configured history start and completed calendar years before the report cutoff year; preserves the IMF values and vintage metadata in `data/final/fiscal_05_components_imf.csv` and the selected observations in `data/final/fiscal_90_balance_graph.csv`. PNG/PDF assets are saved in `outputs/figures/`.
 - `scripts/run_all.R`
 - `scripts/run_validate.R`: validates report-critical outputs after extraction and stops on missing files, schema drift, duplicate keys, invalid values, or stale observations.
 - `scripts/convert_smc_manual_workbooks.R`: converts the six legacy BCV SMC workbooks with Windows Excel before a full historical SMC build.
 - `scripts/prices_02_inflation_bcv.R`: derives monthly, year-over-year, and calendar-year inflation from the BCV CPI index.
+- `scripts/prices_03_cpi_groups_bcv.R` and `scripts/prices_04_inflation_groups_bcv.R`: download the national CPI group table and derive headline/food monthly and year-over-year rates. Food includes non-alcoholic beverages. Both run in `run_prices.R`; set `BCV_CPI_GROUPS_OFFLINE=true` to reprocess the cached workbook. The separate headline extract is preserved and its overlap is audited in `data/interim/prices_03_headline_overlap_check.csv`.
+- `scripts/prices_90_inflation_fx_graphs.R`: after price extraction and FX consolidation, exports standalone headline/food year-over-year inflation and a grouped-column monthly inflation/FX comparison. FX changes use complete calendar-month averages of consolidated daily rates; the comparison ends at the latest complete month common to all four series. Uses the report configuration, saves exact plotted data in `data/final/prices_90_*`, and exports PNG/PDF to `outputs/figures/`.
 - `scripts/report_01_data_layer.R`: assembles validated report variables into a standard long data layer using `registry/report_series.csv`.
 - `report/venezuela_macro.qmd`: neutral Quarto scaffold that renders the same report source to PDF or Word.
 
 ## Client report build
+
+Chart conventions: end each y-axis on an explicit labeled break with no upper expansion, but hide all protruding tick marks. Both x- and y-axis lines are solid charcoal (`#2b3033`, `linewidth = 0.35`). Zero is a thinner solid grey reference (`#687179`, `linewidth = 0.25`); when it coincides with the bottom boundary, the axis remains a single visible line. Use palette colors at full opacity. Keep these settings inline in the ggplot scales/layers and use the shared theme for axis styling. Automatic report scales include their upper endpoint explicitly because recalculated pretty breaks can otherwise omit it.
+
+Prefer a single horizontal legend row whenever labels fit at the normal font size; retain wrapping for dense legends or narrow panels. On linear y-axes, round negative lower limits outward to a complete major-tick interval (including at least one full interval below zero when values are negative), rather than ending the axis just below zero at the data minimum.
 
 Restore the project packages with `renv::restore()`. R and the Quarto CLI must be installed; PDF output also requires a working TeX distribution (for example, `quarto install tinytex`).
 
@@ -88,3 +99,18 @@ The standalone `scripts/oil_14_audit_direct_history.R` compares an external refe
 
 - Source-only extracts are the priority in this phase.
 - Combined estimates, house adjustments, forecast diagnostics, and scheduled runs are intentionally deferred.
+
+### Estimated daily and weekly inflation
+
+- `scripts/prices_05_daily_cpi_bcv.R` allocates headline monthly CPI changes over actual calendar days: daily factor = (current CPI / previous CPI)^(1 / days in month). The estimated daily CPI treats published monthly indices as month-end anchors and reconciles exactly to them.
+- `scripts/prices_06_weekly_inflation_bcv.R` compounds those daily factors over Saturday-Friday weeks. Cross-month weeks use the appropriate factor for each day. Only complete seven-day weeks are published in `data/final/prices_06_weekly_inflation_bcv.csv`; month contributions and boundary coverage are audited in `data/interim/prices_06_weekly_*.csv`.
+- Both run through `scripts/run_prices.R`. These are separately labelled estimates and do not replace published monthly inflation. Monetary observations with irregular spacing retain their actual date intervals, distinct from the fixed seven-day series.
+- Offline checks: `Rscript --vanilla tests/weekly_inflation.R` verifies monthly reconstruction, leap-year/month lengths, mixed-month compounding, and daily CPI ratios.
+
+## Continue on another device
+
+Current report work is on `codex/macro-report-plan`. The report cutoff remains `2026-09-07`; pushing the code does not refresh the source data. Monthly inflation/FX now uses grouped columns; monetary charts retain weekly observations from 2020 and use the shared estimated daily CPI for real levels.
+
+The repository excludes `data/`, `output/`, `outputs/`, and `tmp/`. Copy those data folders separately if the exact local source vintage is needed, or use the domain runners above to download and rebuild inputs. Install dependencies first. Run `scripts/run_prices.R` before `scripts/monetary_92_aggregates_graphs.R`; the latter also requires the monetary runner outputs. Run `scripts/prices_90_inflation_fx_graphs.R` after both price extraction and FX consolidation. Chart scripts save PNG/PDF under `outputs/figures/`.
+
+Daily CPI and Saturday-Friday weekly inflation are reusable derived estimates; published monthly inflation remains separate. For irregular monetary observation intervals, use daily CPI at the actual endpoints. Offline numerical validation: `Rscript --vanilla tests/weekly_inflation.R`.

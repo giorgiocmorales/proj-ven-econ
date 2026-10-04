@@ -22,7 +22,7 @@ build_multiplier_figure <- function(multiplier_data, updated_label) {
     ggplot2::geom_line(
       ggplot2::aes(y = .data$value, color = "Semanal"),
       linewidth = 0.35,
-      alpha = 0.55
+      alpha = 1
     ) +
     ggplot2::geom_line(
       ggplot2::aes(y = .data$moving_average_52w, color = "Promedio m\u00f3vil 52 semanas"),
@@ -33,6 +33,7 @@ build_multiplier_figure <- function(multiplier_data, updated_label) {
       "Semanal" = "#9AA8B2",
       "Promedio m\u00f3vil 52 semanas" = "#003A5D"
     )) +
+    ggplot2::geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
     ggplot2::scale_y_continuous(
       labels = scales::label_number(accuracy = 0.1, big.mark = ".", decimal.mark = ","),
       breaks = y_breaks,
@@ -70,6 +71,7 @@ build_reserve_rates_figure <- function(reserve_data, updated_label) {
       "Marginal" = "#D70036",
       "Especial" = "#B07D24"
     )) +
+    ggplot2::geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
     ggplot2::scale_y_continuous(
       labels = scales::label_number(suffix = "%", accuracy = 1, decimal.mark = ","),
       breaks = scales::breaks_width(10),
@@ -122,6 +124,7 @@ build_deposits_figure <- function(deposits_data, updated_label) {
     ggplot2::ggplot(ggplot2::aes(x = .data$date, y = .data$value, color = .data$series)) +
     ggplot2::geom_line(linewidth = 0.8, na.rm = TRUE) +
     ggplot2::scale_color_manual(values = c("Nominales" = "#003A5D", "Reales" = "#D70036")) +
+    ggplot2::geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
     ggplot2::scale_y_continuous(
       labels = scales::label_number(
         scale = 1e-12,
@@ -174,7 +177,7 @@ build_aggregate_decomposition_figure <- function(annual_data, updated_label) {
 
   contributions %>%
     ggplot2::ggplot(ggplot2::aes(x = .data$year, y = .data$contribution)) +
-    ggplot2::geom_hline(yintercept = 0, color = "grey35", linewidth = 0.4) +
+
     ggplot2::geom_col(
       ggplot2::aes(fill = .data$component),
       width = 0.72,
@@ -199,6 +202,7 @@ build_aggregate_decomposition_figure <- function(annual_data, updated_label) {
       "Liquidez" = "#003A5D",
       "Base monetaria" = "#D70036"
     )) +
+    ggplot2::geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
     ggplot2::scale_y_continuous(
       labels = scales::label_number(accuracy = 1, big.mark = ".", decimal.mark = ","),
       breaks = y_breaks,
@@ -275,7 +279,7 @@ build_decomposition_figure <- function(annual_data, updated_label) {
 
   contributions %>%
     ggplot2::ggplot() +
-    ggplot2::geom_hline(yintercept = 0, color = "grey35", linewidth = 0.4) +
+
     ggplot2::geom_rect(
       ggplot2::aes(
         xmin = .data$year - 0.39,
@@ -311,6 +315,7 @@ build_decomposition_figure <- function(annual_data, updated_label) {
       "Base: Privado" = "#E45D78",
       "Base: Otros internos" = "#F0A3B4"
     )) +
+    ggplot2::geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
     ggplot2::scale_y_continuous(
       labels = scales::label_number(accuracy = 1, big.mark = ".", decimal.mark = ","),
       breaks = function(limits) {
@@ -374,6 +379,7 @@ build_liquidity_composition_figure <- function(liquidity_data, updated_label) {
       "Ahorro transferible" = "#D70036",
       "Cuasidinero" = "#B07D24"
     )) +
+    ggplot2::geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
     ggplot2::scale_y_continuous(
       labels = scales::label_percent(accuracy = 1, decimal.mark = ","),
       breaks = seq(0, 1, by = 0.25),
@@ -438,6 +444,7 @@ build_deposit_currency_composition_figure <- function(deposit_data, updated_labe
       "Depósitos en bolívares" = "#003A5D",
       "Depósitos en divisas (estimados)" = "#D70036"
     )) +
+    ggplot2::geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
     ggplot2::scale_y_continuous(
       labels = scales::label_percent(accuracy = 1, decimal.mark = ","),
       breaks = seq(0, 1, by = 0.2),
@@ -539,6 +546,7 @@ build_deposit_currency_composition_panel_figure <- function(deposit_data, fx_dat
       linewidth = 0
     ) +
     ggplot2::scale_fill_manual(values = palette) +
+    ggplot2::geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
     ggplot2::scale_y_continuous(
       labels = scales::label_number(
         scale = 1e-9,
@@ -579,6 +587,7 @@ build_deposit_currency_composition_panel_figure <- function(deposit_data, fx_dat
       linewidth = 0
     ) +
     ggplot2::scale_fill_manual(values = palette) +
+    ggplot2::geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
     ggplot2::scale_y_continuous(
       labels = scales::label_percent(accuracy = 1, decimal.mark = ","),
       breaks = seq(0, 1, by = 0.2),
