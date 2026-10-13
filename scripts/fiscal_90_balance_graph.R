@@ -2,7 +2,8 @@
 library(tidyverse)
 Sys.setlocale("LC_CTYPE", ".UTF-8")
 source("R/report_figures.R", encoding = "UTF-8")
-config <- yaml::read_yaml(Sys.getenv("REPORT_CONFIG", "config/report.yml"))
+source("R/report_inputs.R")
+config <- read_report_config(path = Sys.getenv("REPORT_CONFIG", "config/report.yml"))
 first_year <- year(as.Date(if (is.null(config$params$fiscal_history_start))
   config$params$history_start else config$params$fiscal_history_start))
 last_year <- year(as.Date(config$params$data_cutoff)) - 1L
@@ -40,7 +41,6 @@ fiscal_figure <- bars %>%
   geom_col(aes(fill = component), width = 0.65, position = "identity") +
   geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
   geom_line(data = plotted, aes(year, balance, color = "Balance fiscal"), linewidth = 0.85) +
-  geom_point(data = plotted, aes(year, balance, color = "Balance fiscal"), size = 1.8) +
   scale_fill_manual(values = c("Ingresos" = report_palette[["navy"]], "Gastos" = report_palette[["red"]])) +
   scale_color_manual(values = c("Balance fiscal" = report_palette[["yellow"]])) +
   scale_y_continuous(limits = range(y_breaks), breaks = y_breaks, expand = expansion(mult = 0),
@@ -49,8 +49,8 @@ fiscal_figure <- bars %>%
   labs(title = "Venezuela: ingresos, gastos y balance fiscal",
     subtitle = paste0("Gobierno general, porcentaje del PIB | ", min(plotted$year), "–", max(plotted$year)),
     x = NULL, y = NULL,
-    caption = paste0("Fuente: FMI, World Economic Outlook. Series del FMI; incluyen estimaciones.\n",
-      "Gastos representados con signo negativo. Balance fiscal = ingresos − gastos.")) +
+    caption = paste0("Notas: incluye estimaciones. Gastos con signo negativo. Balance fiscal = ingresos − gastos.\n",
+      "Fuentes: FMI, World Economic Outlook.")) +
   report_chart_theme + guides(fill = guide_legend(order = 1, nrow = 1), color = guide_legend(order = 2, nrow = 1))
 readr::write_csv(plotted, "data/final/fiscal_90_balance_graph.csv")
 ggsave("outputs/figures/fiscal_revenue_expenditure_balance.png", fiscal_figure,

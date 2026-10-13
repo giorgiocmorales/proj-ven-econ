@@ -184,7 +184,8 @@ bcv_files <- tribble(
   "https://www.bcv.org.ve/sites/default/files/EstadisticasGeneral/2_1_2d25_smc.xls", "2025Q4",
   "https://www.bcv.org.ve/sites/default/files/EstadisticasGeneral/2_1_2a26_smc.xls", "2026Q1",
   "https://bcv.org.ve/sites/default/files/EstadisticasGeneral/2_1_2b26_smc.xls", "2026Q2",
-  "https://bcv.org.ve/sites/default/files/EstadisticasGeneral/2_1_2c26_smc.xls", "2026Q3"
+  "https://bcv.org.ve/sites/default/files/EstadisticasGeneral/2_1_2c26_smc.xls", "2026Q3",
+  "https://bcv.org.ve/sites/default/files/EstadisticasGeneral/2_1_2d26_smc.xls", "2026Q4"
   
 )
 

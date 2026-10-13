@@ -6,10 +6,15 @@ if (.Platform$OS.type == "windows" && !l10n_info()[["UTF-8"]]) {
   if (!nzchar(Sys.setlocale("LC_CTYPE", ".UTF-8"))) stop("UTF-8 locale required")
 }
 source("R/report_figures.R", encoding = "UTF-8")
+source("R/report_inputs.R")
+# Include only quarters that have ended by the common report cutoff.
+config <- read_report_config(path = Sys.getenv("REPORT_CONFIG", "config/report.yml"))
+cutoff <- as.Date(config$params$data_cutoff)
 
 source_file <- "data/processed/real_03_gdp_q_a_bcv.csv"
 quarterly <- readr::read_csv(source_file, show_col_types = FALSE) %>%
-  filter(series_label == "Consolidado", frequency == "quarterly", unit == "percent_yoy") %>%
+  filter(series_label == "Consolidado", frequency == "quarterly", unit == "percent_yoy",
+         lubridate::ceiling_date(date, "quarter") - lubridate::days(1) <= cutoff) %>%
   transmute(date, year = as.integer(year), quarter = as.integer(quarter),
             growth = value, provisional, source_id, source_file = source_file,
             source_detail = source_url, downloaded_at) %>% arrange(date)
@@ -31,8 +36,8 @@ recent_start <- as.Date("2019-01-01")
 recent <- quarterly %>% filter(date >= recent_start)
 if (!nrow(recent)) stop("No quarterly GDP observations in the recent window")
 provisional_note <- if (any(quarterly$provisional %in% TRUE)) {
-  "Nota: incluye cifras provisionales según el extracto BCV."
-} else "Nota: clasificación provisional según el extracto BCV."
+  "Notas: incluye cifras provisionales según el extracto BCV."
+} else "Notas: clasificación provisional según el extracto BCV."
 
 growth_style <- list(
 
@@ -58,8 +63,8 @@ build_quarterly <- function(data, every_quarter = FALSE) {
       subtitle = paste0("Variación respecto al mismo trimestre del año anterior (%) | ",
         quarter_label(min(data$date)), "–", quarter_label(max(data$date))),
       x = NULL, y = NULL,
-      caption = paste("Fuente: BCV; PIB consolidado por actividad económica.",
-                      provisional_note, sep = "\n")) +
+      caption = paste(provisional_note,
+                      "Fuentes: BCV; PIB consolidado por actividad económica.", sep = "\n")) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 }
 figures <- list(real_gdp_growth_quarterly = build_quarterly(quarterly),
@@ -68,7 +73,8 @@ figures <- list(real_gdp_growth_quarterly = build_quarterly(quarterly),
 annual_file <- "data/final/real_90_gdp_growth.csv"
 if (file.exists(annual_file)) {
   annual <- readr::read_csv(annual_file, show_col_types = FALSE) %>%
-    filter(year >= lubridate::year(recent_start), year <= max(quarterly$year))
+    filter(year >= lubridate::year(recent_start), year <= max(quarterly$year),
+           lubridate::make_date(year, 12L, 31L) <= cutoff)
   if (!nrow(annual) || anyDuplicated(annual$year) || any(!is.finite(annual$growth))) {
     stop("Annual comparison requires unique, finite annual growth observations")
   }
@@ -85,8 +91,9 @@ if (file.exists(annual_file)) {
     labs(title = "Venezuela: crecimiento del PIB real",
       subtitle = "Variación interanual (%) | Perspectiva anual y trimestral; escala vertical común",
       x = NULL, y = NULL,
-      caption = paste("Fuente: BCV. Tasas anuales publicadas; no son promedios de las tasas trimestrales.",
-                      provisional_note, sep = "\n")) +
+      caption = paste(provisional_note,
+                      "Tasas anuales publicadas; no son promedios de las tasas trimestrales.",
+                      "Fuentes: BCV.", sep = "\n")) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
   readr::write_csv(comparison, "data/final/real_91_gdp_comparison_graph.csv")
 }

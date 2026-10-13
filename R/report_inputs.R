@@ -2,12 +2,15 @@
 read_report_config <- function(path) {
   # Preserve accented client metadata even when the host starts R in the C locale.
   config <- yaml::yaml.load(paste(readLines(path, encoding = "UTF-8", warn = TRUE), collapse = "\n"))
-  required_params <- c("client", "data_cutoff", "history_start", "recent_history_start", "summary_first_year", "summary_last_year")
+  required_params <- c("client", "history_start", "recent_history_start", "summary_first_year", "summary_last_year")
   if (!all(c("title", "subtitle", "date", "params") %in% names(config)) ||
       !all(required_params %in% names(config$params))) {
     rlang::abort("Report configuration is missing required metadata or parameters", class = "report_config_error")
   }
 
+  # Use the latest completed month before publication, consistently across all analysis.
+  publication_date <- readr::parse_date(config$date, format = "%Y-%m-%d")
+  config$params$data_cutoff <- as.character(lubridate::floor_date(publication_date, "month") - lubridate::days(1))
   dates <- readr::parse_date(c(config$date, config$params$data_cutoff, config$params$history_start, config$params$recent_history_start), format = "%Y-%m-%d")
   years <- c(config$params$summary_first_year, config$params$summary_last_year)
   if (anyNA(dates) || dates[3] > dates[4] || dates[4] > dates[2] || dates[2] > dates[1] ||

@@ -1,53 +1,48 @@
 # Build compact, presentation-ready tables for the Venezuela macro report scaffold.
 
-build_executive_table <- function(data, first_year, last_year) {
-  annual_data <- data %>%
-    filter(
-      .data$variable_id %in% c(
-        "gdp_real_growth_bcv", "gdp_real_growth_imf", "inflation_calendar_year",
-        "goods_exports_fob", "goods_imports_fob", "fiscal_balance_gdp"
-      ),
-      lubridate::year(.data$date) >= first_year,
-      lubridate::year(.data$date) <= last_year
-    ) %>%
-    mutate(
-      table_label = case_when(
-        .data$variable_id == "gdp_real_growth_bcv" ~ "Real GDP growth (BCV)",
-        .data$variable_id == "gdp_real_growth_imf" ~ "Real GDP growth (IMF reference)",
-        .data$variable_id == "inflation_calendar_year" ~ "Calendar-year inflation",
-        .data$variable_id == "goods_exports_fob" ~ "Goods exports f.o.b.",
-        .data$variable_id == "goods_imports_fob" ~ "Goods imports f.o.b.",
-        .data$variable_id == "fiscal_balance_gdp" ~ "Fiscal balance"
-      ),
-      year = as.character(lubridate::year(.data$date)),
-      formatted_value = case_when(
-        .data$unit %in% c("percent_yoy", "percent_GDP") ~ scales::number(.data$value, accuracy = 0.1, suffix = "%"),
-        .data$unit == "million_USD" ~ scales::number(.data$value / 1000, accuracy = 0.1, suffix = " bn"),
-        TRUE ~ scales::number(.data$value, accuracy = 0.1)
-      )
-    ) %>%
-    select(.data$table_label, .data$year, .data$formatted_value)
+build_executive_table <- function(data, closing_year) {
+  # Keep the executive indicator inventory explicit while forecasting is unfinished.
+  indicators <- tibble::tribble(
+    ~variable_id, ~Indicador, ~Unidad,
+    "gdp_real_growth_bcv", "Crecimiento del PIB real", "% anual",
+    "inflation_calendar_year", "Inflaci\u00f3n general", "% anual",
+    "official_fx_bcv", "Tipo de cambio oficial", "Bs./USD",
+    "alternative_fx_yadio", "Tipo de cambio alternativo", "Bs./USD",
+    "monetary_base", "Base monetaria", "Bn Bs.",
+    "monetary_liquidity", "Liquidez monetaria", "Bn Bs.",
+    "oil_production_secondary", "Producci\u00f3n petrolera (fuentes secundarias)", "Mil b/d",
+    "oil_price_merey", "Precio del Merey", "USD/b",
+    "oil_price_brent", "Precio del Brent", "USD/b",
+    "oil_price_wti", "Precio del WTI", "USD/b",
+    "goods_exports_fob", "Exportaciones de bienes", "MM USD",
+    "goods_imports_fob", "Importaciones de bienes", "MM USD",
+    "international_reserves", "Reservas internacionales", "MM USD",
+    "fx_intervention_amount", "Intervenciones cambiarias", "MM USD",
+    "fiscal_revenue_gdp", "Ingresos del gobierno general", "% del PIB",
+    "fiscal_expenditure_gdp", "Gastos del gobierno general", "% del PIB",
+    "fiscal_balance_gdp", "Balance del gobierno general (FMI)", "% del PIB",
+    "seniat_revenue", "Recaudaci\u00f3n tributaria", "MM USD"
+  )
 
-  if (nrow(annual_data) == 0) {
-    stop("Report data contains no annual observations for the executive table", call. = FALSE)
-  }
-
-  annual_data %>%
-    distinct() %>%
-    pivot_wider(
-      names_from = .data$year,
-      values_from = .data$formatted_value,
-      values_fill = "-"
-    ) %>%
-    mutate(across(-.data$table_label, ~ tidyr::replace_na(.x, "-"))) %>%
-    arrange(match(
-      .data$table_label,
-      c(
-        "Real GDP growth (BCV)", "Real GDP growth (IMF reference)",
-        "Calendar-year inflation", "Goods exports f.o.b.", "Goods imports f.o.b.",
-        "Fiscal balance"
-      )
+  # Stocks and prices require December observations; annual flows retain annual totals.
+  closing_values <- data %>%
+    filter(.data$variable_id %in% indicators$variable_id,
+           lubridate::year(.data$date) == closing_year,
+           .data$frequency == "annual" | lubridate::month(.data$date) == 12L) %>%
+    group_by(.data$variable_id) %>%
+    slice_max(.data$date, n = 1, with_ties = FALSE) %>%
+    ungroup() %>%
+    transmute(variable_id, closing_value = scales::number(
+      .data$value, accuracy = 0.1, big.mark = ".", decimal.mark = ","
     ))
+
+  # Leave both model columns empty of numbers until forecasts are explicitly produced.
+  indicators %>%
+    left_join(closing_values, by = "variable_id") %>%
+    transmute(Indicador, Unidad,
+      !!paste(closing_year, "cierre") := tidyr::replace_na(.data$closing_value, "Pendiente"),
+      !!paste(closing_year + 1L, "estimado") := "Pendiente",
+      !!paste(closing_year + 2L, "proyectado") := "Pendiente")
 }
 
 build_external_table <- function(data, first_year, last_year) {

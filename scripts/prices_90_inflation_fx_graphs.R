@@ -2,7 +2,8 @@
 library(tidyverse)
 Sys.setlocale("LC_CTYPE", ".UTF-8")
 source("R/report_figures.R", encoding = "UTF-8")
-config <- yaml::read_yaml(Sys.getenv("REPORT_CONFIG", "config/report.yml"))
+source("R/report_inputs.R")
+config <- read_report_config(path = Sys.getenv("REPORT_CONFIG", "config/report.yml"))
 start_date <- as.Date(config$params$recent_history_start)
 cutoff <- as.Date(config$params$data_cutoff)
 # A month is included only once its final calendar day is within the cutoff.
@@ -59,7 +60,7 @@ yoy_figure <- yoy_data %>%
   labs(title = "Venezuela: inflación interanual general y de alimentos",
     subtitle = paste0("Variación respecto al mismo mes del año anterior (%) | ",
       format(min(yoy_data$date), "%m/%Y"), "–", format(end_date, "%m/%Y")), x = NULL, y = NULL,
-    caption = "Fuente: BCV; INPC nacional clasificado por grupos. Cálculos a partir de los índices.\nNota: alimentos incluye bebidas no alcohólicas; la fuente contiene cifras provisionales.") +
+    caption = "Notas: cálculos a partir de los índices; alimentos incluye bebidas no alcohólicas; cifras provisionales.\nFuentes: BCV; INPC nacional clasificado por grupos.") +
   report_chart_theme
 
 monthly_figure <- monthly_data %>%
@@ -75,7 +76,7 @@ monthly_figure <- monthly_data %>%
   labs(title = "Venezuela: variación mensual de precios y tipos de cambio",
     subtitle = paste0("Variación respecto al mes anterior (%) | ",
       format(min(monthly_data$date), "%m/%Y"), "–", format(comparison_end, "%m/%Y")), x = NULL, y = NULL,
-    caption = "Fuentes: BCV y Yadio; cálculos propios. INPC general y alimentos (incluye bebidas no alcohólicas).\nTC: variación del promedio mensual de tasas diarias consolidadas. Solo meses completos; IPC provisional.") +
+    caption = "Notas: alimentos incluye bebidas no alcohólicas. TC: variación del promedio mensual de tasas diarias consolidadas.\nSolo meses completos; IPC provisional.\nFuentes: BCV y Yadio; cálculos propios.") +
   report_chart_theme + guides(fill = guide_legend(nrow = 1, byrow = TRUE))
 
 readr::write_csv(yoy_data, "data/final/prices_90_inflation_yoy_graph.csv")

@@ -7,7 +7,8 @@ if (.Platform$OS.type == "windows" && !l10n_info()[["UTF-8"]]) {
 source("R/report_figures.R", encoding = "UTF-8")
 
 config_path <- Sys.getenv("REPORT_CONFIG", "config/report.yml")
-config <- yaml::read_yaml(config_path)
+source("R/report_inputs.R")
+config <- read_report_config(path = config_path)
 start_date <- as.Date(config$params$recent_history_start)
 cutoff <- as.Date(config$params$data_cutoff)
 if (length(start_date) != 1L || length(cutoff) != 1L ||
@@ -78,8 +79,8 @@ rates_figure <- ggplot(rates, aes(date, value, color = series)) +
   labs(title = "Venezuela: tipo de cambio oficial y no oficial",
     subtitle = paste0("Series diarias, bolívares actuales por USD | ", period_label),
     x = NULL, y = NULL,
-    caption = paste0("Fuentes: BCV (SMC) y Yadio (tipo implícito).\n",
-      "Nota: la serie consolidada conserva el último valor entre observaciones de cada fuente.")) +
+    caption = paste0("Notas: la serie consolidada conserva el último valor entre observaciones de cada fuente.\n",
+      "Fuentes: BCV (SMC) y Yadio (tipo implícito).")) +
   common_axes
 gap_figure <- ggplot(plotted, aes(date)) +
 
@@ -97,8 +98,8 @@ gap_figure <- ggplot(plotted, aes(date)) +
   labs(title = "Venezuela: brecha cambiaria",
     subtitle = paste0("(Tipo no oficial / tipo oficial − 1) × 100 | ", period_label),
     x = NULL, y = NULL,
-    caption = paste0("Fuentes: BCV y Yadio; cálculos propios sobre la serie consolidada.\n",
-      "Media móvil: promedio de los últimos 30 días calendario, incluido el día actual; exige 30 valores.")) +
+    caption = paste0("Notas: media móvil de los últimos 30 días calendario, incluido el día actual; exige 30 valores.\n",
+      "Fuentes: BCV y Yadio; cálculos propios sobre la serie consolidada.")) +
   common_axes
 
 dir.create("outputs/figures", recursive = TRUE, showWarnings = FALSE)

@@ -1,14 +1,14 @@
 variable_id,section,display_label,source_key,source_file,source_series,source_frequency,frequency,unit,observation_role,transformation,source_priority,max_age_days
 gdp_real_growth_bcv,growth,Real GDP growth,gdp_bcv,data/processed/real_01_gdp_a_a_bcv.csv,Consolidado,annual,annual,percent_yoy,actual,identity,1,730
 gdp_real_growth_imf,growth,IMF real GDP growth reference,gdp_imf,data/processed/real_05_gdp_imf.csv,gdp_real_growth,annual,annual,percent_yoy,reference,identity,2,730
-cpi_index,inflation_exchange_rate,Consumer price index,cpi,data/final/prices_02_inflation_bcv.csv,cpi_index,monthly,monthly,index_dec_2007_100,actual,identity,1,150
-inflation_mom,inflation_exchange_rate,Monthly inflation,cpi,data/final/prices_02_inflation_bcv.csv,inflation_mom,monthly,monthly,percent_mom,actual,percent_change_from_cpi_index,1,150
-inflation_yoy,inflation_exchange_rate,Annual inflation,cpi,data/final/prices_02_inflation_bcv.csv,inflation_yoy,monthly,monthly,percent_yoy,actual,percent_change_from_cpi_index_lag_12,1,150
-inflation_calendar_year,inflation_exchange_rate,Calendar-year inflation,cpi,data/final/prices_02_inflation_bcv.csv,inflation_calendar_year,annual,annual,percent_yoy,actual,december_to_december_percent_change,1,400
-official_fx_bcv,inflation_exchange_rate,Official exchange rate,fx,data/final/external_fx.csv,rate_indx_adj,daily,daily,VES_per_USD,actual,redenomination_adjusted_to_current_VES,1,14
+cpi_index,inflation_exchange_rate,Consumer price index,cpi,data/processed/prices_03_cpi_groups_bcv.csv,cpi_index,monthly,monthly,index_dec_2007_100,actual,identity,1,150
+inflation_mom,inflation_exchange_rate,Monthly inflation,cpi,data/final/prices_04_inflation_groups_bcv.csv,inflation_mom,monthly,monthly,percent_mom,actual,percent_change_from_cpi_index,1,150
+inflation_yoy,inflation_exchange_rate,Annual inflation,cpi,data/final/prices_04_inflation_groups_bcv.csv,inflation_yoy,monthly,monthly,percent_yoy,actual,percent_change_from_cpi_index_lag_12,1,150
+inflation_calendar_year,inflation_exchange_rate,Calendar-year inflation,cpi,data/final/prices_04_inflation_groups_bcv.csv,inflation_calendar_year,annual,annual,percent_yoy,actual,december_to_december_percent_change,1,400
+official_fx_bcv,inflation_exchange_rate,Official exchange rate,fx,data/final/external_fx.csv,rate_smc_adj,daily,daily,VES_per_USD,actual,redenomination_adjusted_to_current_VES,1,14
 alternative_fx_yadio,inflation_exchange_rate,Alternative exchange rate,fx,data/final/external_fx.csv,rate_yad,daily,daily,VES_per_USD,actual,identity,2,14
 oil_production_secondary,oil,Crude oil production (secondary sources),oil_production,data/final/oil_01_prod_opec_latest.csv,secondary_sources,monthly,monthly,thousand_barrels_per_day,actual,identity,1,200
 oil_price_merey,oil,Merey crude oil price,oil_price,data/final/oil_02_price_opec_latest.csv,merey,monthly,monthly,USD_per_barrel,actual,identity,1,200
 goods_exports_fob,external,Exports of goods f.o.b.,bop_goods,data/final/external_bop_goods.csv,goods_exports_fob,annual,annual,million_USD,actual,identity,1,730
 goods_imports_fob,external,Imports of goods f.o.b.,bop_goods,data/final/external_bop_goods.csv,goods_imports_fob,annual,annual,million_USD,actual,source_sign_reversed_to_positive_magnitude,1,730
-fiscal_balance_gdp,fiscal,General government fiscal balance,fiscal_balance,data/processed/fiscal_02_bal_imf.csv,general_government_balance_gdp,annual,annual,percent_GDP,reference,identity,1,730
+fiscal_balance_gdp,fiscal,General government fiscal balance,fiscal_balance,data/processed/fiscal_05_components_imf.csv,general_government_balance_gdp,annual,annual,percent_GDP,reference,identity,1,730

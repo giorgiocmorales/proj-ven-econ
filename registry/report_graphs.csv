@@ -1,0 +1,12 @@
+figure_id,script_path,image_path,data_path
+growth,scripts/real_91_gdp_quarterly_graphs.R,outputs/figures/real_gdp_growth_annual_quarterly.png,data/final/real_91_gdp_comparison_graph.csv
+inflation,scripts/prices_90_inflation_fx_graphs.R,outputs/figures/prices_inflation_headline_food_yoy.png,data/final/prices_90_inflation_yoy_graph.csv
+inflation_fx_monthly,scripts/prices_90_inflation_fx_graphs.R,outputs/figures/prices_inflation_fx_monthly.png,data/final/prices_90_inflation_fx_monthly_graph.csv
+fx,scripts/external_99_fx_report_graphs.R,outputs/figures/external_fx_daily.png,data/final/external_99_fx_graph.csv
+fx_gap,scripts/external_99_fx_report_graphs.R,outputs/figures/external_fx_gap_daily_ma30.png,data/final/external_99_fx_graph.csv
+oil_production,scripts/oil_90_graphs.R,outputs/figures/oil_production_sources.png,data/final/oil_90_production_graph.csv
+oil_prices,scripts/oil_90_graphs.R,outputs/figures/oil_prices_benchmarks.png,data/final/oil_90_prices_graph.csv
+external,scripts/external_98_goods_graphs.R,outputs/figures/external_goods_trade.png,data/final/external_98_goods_graph.csv
+fiscal,scripts/fiscal_90_balance_graph.R,outputs/figures/fiscal_revenue_expenditure_balance.png,data/final/fiscal_90_balance_graph.csv
+monetary_real,scripts/monetary_92_aggregates_graphs.R,outputs/figures/monetary_base_liquidity_real.png,data/final/monetary_92_aggregates.csv
+monetary_growth,scripts/monetary_92_aggregates_graphs.R,outputs/figures/monetary_base_liquidity_growth_yoy.png,data/final/monetary_92_aggregates.csv

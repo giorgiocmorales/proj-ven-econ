@@ -1,7 +1,8 @@
 # Build source-aware report charts with the growth-scenarios visual baseline.
 # Trends compare GDP sources, monthly prices, daily FX, and oil indicators.
 # Annual goods and fiscal columns compare yearly magnitudes against zero.
-# Word/PNG exports share plots; facets retain independent units and line types identify sources.
+# Word/PNG exports share plots; facets retain independent units and colors identify sources.
+# Line graphs use solid lines without points; captions place notes above sources.
 
 # Baseline: proj-ven-growth-scenarios/scripts/_presentation_theme.R.
 # Keep the report self-contained; scale the presentation typography to a Word page.
@@ -107,12 +108,10 @@ build_growth_figure <- function(data) {
       "FMI referencia"
     ))
 
-  ggplot(growth_data, aes(x = .data$date, y = .data$value, color = .data$series, linetype = .data$series)) +
+  ggplot(growth_data, aes(x = .data$date, y = .data$value, color = .data$series)) +
 
     geom_line(linewidth = 0.7) +
-    geom_point(size = 1.6) +
     scale_color_manual(values = c("BCV observado" = report_palette[["navy"]], "FMI referencia" = report_palette[["red"]])) +
-    scale_linetype_manual(values = c("BCV observado" = "solid", "FMI referencia" = "dashed")) +
     geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
     scale_y_continuous(
       labels = scales::label_number(suffix = "%", big.mark = ".", decimal.mark = ","),
@@ -126,7 +125,7 @@ build_growth_figure <- function(data) {
       subtitle = "Variaci\u00f3n interanual; observaciones BCV y referencia FMI",
       x = NULL,
       y = "Porcentaje",
-      caption = "Fuentes: BCV y FMI. La serie del FMI es una referencia externa."
+      caption = "Notas: la serie del FMI es una referencia externa.\nFuentes: BCV y FMI."
     ) +
     report_chart_theme
 }
@@ -144,15 +143,11 @@ build_inflation_figure <- function(data) {
       "Inflaci\u00f3n mensual"
     ))
 
-  ggplot(inflation_data, aes(x = .data$date, y = .data$value, color = .data$series, linetype = .data$series)) +
+  ggplot(inflation_data, aes(x = .data$date, y = .data$value, color = .data$series)) +
     geom_line(linewidth = 0.7) +
     scale_color_manual(values = c(
       "Inflaci\u00f3n interanual" = report_palette[["navy"]],
       "Inflaci\u00f3n mensual" = report_palette[["red"]]
-    )) +
-    scale_linetype_manual(values = c(
-      "Inflaci\u00f3n interanual" = "solid",
-      "Inflaci\u00f3n mensual" = "dashed"
     )) +
     facet_wrap(~series, scales = "free_y", ncol = 2) +
     geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
@@ -168,7 +163,7 @@ build_inflation_figure <- function(data) {
       subtitle = "Variaciones del IPC; escalas independientes",
       x = NULL,
       y = "Porcentaje",
-      caption = "Fuente: BCV. C\u00e1lculos a partir del \u00edndice de precios al consumidor."
+      caption = "Notas: c\u00e1lculos a partir del \u00edndice de precios al consumidor.\nFuentes: BCV."
     ) +
     report_chart_theme + theme(legend.position = "none")
 }
@@ -186,10 +181,9 @@ build_fx_figure <- function(data) {
       "TC alternativo"
     ))
 
-  ggplot(fx_data, aes(x = .data$date, y = .data$value, color = .data$series, linetype = .data$series)) +
+  ggplot(fx_data, aes(x = .data$date, y = .data$value, color = .data$series)) +
     geom_line(linewidth = 0.7) +
     scale_color_manual(values = c("TC oficial" = report_palette[["navy"]], "TC alternativo" = report_palette[["red"]])) +
-    scale_linetype_manual(values = c("TC oficial" = "solid", "TC alternativo" = "dashed")) +
     geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
     scale_y_continuous(
       labels = scales::label_number(big.mark = ".", decimal.mark = ","),
@@ -232,7 +226,7 @@ build_external_figure <- function(data) {
       title = "Comercio exterior de bienes",
       subtitle = "Exportaciones e importaciones anuales, f.o.b.",
       x = NULL, y = "Miles de millones de USD",
-      caption = "Fuente: BCV. Importaciones expresadas como magnitudes positivas."
+      caption = "Notas: importaciones expresadas como magnitudes positivas.\nFuentes: BCV."
     ) +
     report_chart_theme
 }
@@ -252,13 +246,13 @@ build_oil_figure <- function(data) {
 
   ggplot(oil_data, aes(x = .data$date, y = .data$value, color = .data$series)) +
     geom_line(linewidth = 0.7, show.legend = FALSE) +
-    geom_point(size = 1.6, show.legend = FALSE) +
     facet_wrap(~factor(series, levels = c("Producci\u00f3n (miles de barriles diarios)", "Precio Merey (USD por barril)")), scales = "free_y", ncol = 1) +
     scale_color_manual(values = c(
       "Producci\u00f3n (miles de barriles diarios)" = report_palette[["navy"]],
       "Precio Merey (USD por barril)" = report_palette[["red"]]
     )) +
-    scale_x_date(date_breaks = "3 months", date_labels = "%m/%Y") +
+    # Annual labels keep the expanded historical corpus readable on a report page.
+    scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
     geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
     scale_y_continuous(
       labels = scales::label_number(big.mark = ".", decimal.mark = ","),
@@ -271,7 +265,7 @@ build_oil_figure <- function(data) {
       subtitle = "Observaciones mensuales; escalas independientes",
       x = NULL,
       y = NULL,
-      caption = "Fuente: OPEP. Producci\u00f3n seg\u00fan fuentes secundarias."
+      caption = "Notas: producci\u00f3n seg\u00fan fuentes secundarias.\nFuentes: OPEP."
     ) +
     report_chart_theme
 }
@@ -300,7 +294,7 @@ build_fiscal_figure <- function(data) {
       subtitle = "Estimaci\u00f3n del FMI como proporci\u00f3n del PIB",
       x = NULL,
       y = "Porcentaje del PIB",
-      caption = "Fuente: FMI. Referencia externa; no corresponde a una estimaci\u00f3n propia."
+      caption = "Notas: referencia externa; no corresponde a una estimaci\u00f3n propia.\nFuentes: FMI."
     ) +
     report_chart_theme
 }

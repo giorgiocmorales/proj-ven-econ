@@ -6,6 +6,20 @@ source("R/report_figures.R")
 
 # Build a small fixture from the tracked registry; no downloaded data are needed.
 config <- read_report_config(path = "config/report.yml")
+
+# The cutoff follows publication month-end rules, including leap years and year changes.
+config_fixture_path <- tempfile(fileext = ".yml")
+config$params$summary_last_year <- 2023L
+for (publication_date in c("2024-03-01", "2025-03-31", "2026-01-07")) {
+  config$date <- publication_date
+  yaml::write_yaml(config, config_fixture_path)
+  resolved <- read_report_config(path = config_fixture_path)
+  expected_cutoff <- c("2024-02-29", "2025-02-28", "2025-12-31")[[
+    match(publication_date, c("2024-03-01", "2025-03-31", "2026-01-07"))
+  ]]
+  stopifnot(identical(resolved$params$data_cutoff, expected_cutoff))
+}
+unlink(config_fixture_path)
 settings <- list(client = "Test", data_cutoff = "2026-09-07", history_start = "2019-01-01", summary_first_year = 2021, summary_last_year = 2025)
 registry <- readr::read_csv("registry/report_series.csv", show_col_types = FALSE)
 fixture <- registry %>%
@@ -54,5 +68,21 @@ readr::write_csv(fixture, fixture_path)
 value_error <- tryCatch(read_report_series(file_path = fixture_path), report_data_error = identity)
 stopifnot(inherits(value_error, "report_data_error"))
 unlink(fixture_path)
+
+# Chart conventions remain consistent across the reusable report figures.
+figures <- list(
+  build_growth_figure(valid$data), build_inflation_figure(valid$data),
+  build_fx_figure(valid$data), build_oil_figure(valid$data),
+  build_external_figure(valid$data), build_fiscal_figure(valid$data)
+)
+for (figure in figures) {
+  stopifnot(!any(vapply(figure$layers, function(layer) inherits(layer$geom, "GeomPoint"), logical(1))))
+  for (layer_data in ggplot_build(figure)$data) {
+    if ("linetype" %in% names(layer_data)) stopifnot(all(layer_data$linetype %in% c("solid", 1)))
+  }
+  caption_lines <- strsplit(figure$labels$caption, "\n", fixed = TRUE)[[1]]
+  stopifnot(grepl("^Fuentes:", tail(caption_lines, 1)))
+  if (length(caption_lines) > 1L) stopifnot(grepl("^Notas:", caption_lines[1]))
+}
 
 message("Report pipeline regression checks passed.")

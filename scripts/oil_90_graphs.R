@@ -11,12 +11,16 @@ if (.Platform$OS.type == "windows" && !l10n_info()[["UTF-8"]]) {
   }
 }
 source("R/report_figures.R", encoding = "UTF-8")
+source("R/report_inputs.R")
+# Apply the same completed-month cutoff as every other report chart.
+config <- read_report_config(path = Sys.getenv("REPORT_CONFIG", "config/report.yml"))
+cutoff <- as.Date(config$params$data_cutoff)
 
 # Use the full monthly history recovered from the report corpus.
 # Read monthly observations only: annual averages and year-to-date rows are excluded.
 production <- readr::read_csv("data/final/oil_01_prod_opec_latest.csv", show_col_types = FALSE,
                               col_types = cols(footnote_marker = col_character())) %>%
-  filter(.data$country == "Venezuela", .data$period_type == "monthly",
+  filter(.data$date <= cutoff, .data$country == "Venezuela", .data$period_type == "monthly",
          .data$source_type %in% c("direct_communication", "secondary_sources")) %>%
   mutate(series = factor(.data$source_type,
     levels = c("direct_communication", "secondary_sources"),
@@ -26,10 +30,10 @@ production <- readr::read_csv("data/final/oil_01_prod_opec_latest.csv", show_col
 # North Sea Dated is the spot benchmark in the OPEC table, not Brent futures.
 prices <- readr::read_csv("data/final/oil_02_price_opec_latest.csv", show_col_types = FALSE,
                           col_types = cols(footnote_marker = col_character())) %>%
-  filter(.data$period_type == "monthly", .data$variable_id %in% c("wti", "north_sea_dated", "merey")) %>%
+  filter(.data$date <= cutoff, .data$period_type == "monthly", .data$variable_id %in% c("wti", "north_sea_dated", "merey")) %>%
   mutate(series = factor(.data$variable_id,
     levels = c("wti", "north_sea_dated", "merey"),
-    labels = c("WTI", "Brent (North Sea Dated)", "Merey"))) %>%
+    labels = c("WTI", "Brent", "Merey"))) %>%
   arrange(.data$series, .data$date)
 
 # Require the requested series, units, valid dates, finite values, and unique keys.
@@ -83,14 +87,16 @@ production_figure <- production %>%
        subtitle = paste0("Miles de barriles diarios | ", format(min(production$date), "%m/%Y"),
                          "\u2013", format(max(production$date), "%m/%Y")),
        x = NULL, y = NULL,
-       caption = "Fuente: OPEP, informes mensuales del mercado petrolero. \u00daltima revisi\u00f3n disponible por mes.") +
+       caption = "Notas: \u00faltima revisi\u00f3n disponible por mes.\nFuentes: OPEP, informes mensuales del mercado petrolero.") +
   report_chart_theme
 
 # Compare like-frequency spot benchmarks, preserving each crude's published identity.
 prices_figure <- prices %>%
   ggplot(aes(x = .data$date, y = .data$value, color = .data$series)) +
   geom_line(linewidth = 0.7, linetype = "solid") +
-  scale_color_manual(values = unname(report_palette[c("navy", "red", "cyan")])) +
+  scale_color_manual(values = c(WTI = report_palette[["cyan"]],
+                                Brent = report_palette[["navy"]],
+                                Merey = report_palette[["red"]])) +
   scale_x_date(breaks = seq(as.Date("2000-01-01"), max(prices$date), by = "5 years"), date_labels = "%Y") +
   geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
   scale_y_continuous(
@@ -103,7 +109,7 @@ prices_figure <- prices %>%
        subtitle = paste0("Promedios mensuales, USD por barril | ", format(min(prices$date), "%m/%Y"),
                          "\u2013", format(max(prices$date), "%m/%Y")),
        x = NULL, y = NULL,
-       caption = "Fuente: OPEP, informes mensuales del mercado petrolero. Brent corresponde a North Sea Dated.") +
+       caption = "Notas: Brent corresponde a North Sea Dated.\nFuentes: OPEP, informes mensuales del mercado petrolero.") +
   report_chart_theme
 
 # Export the observations, coverage audit, and matching PNG/PDF assets for both graphs.

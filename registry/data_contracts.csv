@@ -1,4 +1,7 @@
 dataset_id,file_path,required_columns,key_columns,date_column,min_rows,max_age_days,non_negative_columns,latest_non_missing_columns
+prices_03_cpi_groups_bcv,data/processed/prices_03_cpi_groups_bcv.csv,"date,series_id,cpi_index,provisional,source_id,dataset_id,source_url",series_id|date,date,250,150,cpi_index,cpi_index
+prices_04_inflation_groups_bcv,data/final/prices_04_inflation_groups_bcv.csv,"date,series_id,variable_id,value,frequency,provisional,source_id,dataset_id,source_url",series_id|variable_id|date,date,500,150,,value
+fiscal_05_components_imf,data/processed/fiscal_05_components_imf.csv,"date,COUNTRY,INDICATOR,OBS_VALUE,COUNTRY_UPDATE_DATE",INDICATOR|date,date,60,730,,OBS_VALUE
 real_05_gdp_imf,data/processed/real_05_gdp_imf.csv,"COUNTRY,INDICATOR,FREQUENCY,OBS_VALUE,dataset_id,source_id,target_variable,date",target_variable|date,date,20,730,,OBS_VALUE
 real_01_gdp_a_a_bcv,data/processed/real_01_gdp_a_a_bcv.csv,"row_id,series_label,value,year,date,frequency,unit,dataset_id,source_id",row_id|date,date,100,730,,value
 real_03_gdp_q_a_bcv,data/processed/real_03_gdp_q_a_bcv.csv,"row_id,series_label,value,year,quarter,date,frequency,unit,dataset_id,source_id",row_id|date,date,100,365,,value
@@ -6,7 +9,7 @@ prices_01_cpi_bcv,data/processed/prices_01_cpi_bcv.csv,"dataset_id,source_id,dat
 prices_02_inflation_bcv,data/final/prices_02_inflation_bcv.csv,"date,frequency,variable_id,value,unit,provisional,source_id,dataset_id,source_dataset_id,transformation",variable_id|date,date,650,150,,value
 external_01_fx_smc_bcv,data/processed/external_01_fx_smc_bcv.csv,"sheet_id,currency,fecha_operacion,fecha_valor,bid,ask,database_id",fecha_valor|currency,fecha_valor,2000,14,bid|ask,bid|ask
 external_02_fx_ind_bcv,data/processed/external_02_fx_ind_bcv.csv,"fecha,tasa",fecha,fecha,1500,14,tasa,tasa
-external_fx,data/final/external_fx.csv,date,date,date,2500,14,,rate_smc|rate_indx
+external_fx,data/final/external_fx.csv,date,date,date,2500,14,,rate_smc_adj|rate_yad
 external_03_fx_int_bcv,data/processed/external_03_fx_int_bcv.csv,"date,intervention_id,rate,currency,source_id",date|intervention_id,date,300,45,rate,rate
 external_05_bop_a_bcv,data/processed/external_05_bop_a_bcv.csv,"row_id,series_label,value,year,date,frequency,unit,dataset_id,source_id",row_id|date,date,1000,730,,value
 external_bop_goods,data/final/external_bop_goods.csv,"date,frequency,variable_id,value_source,value,unit,provisional,source_id,dataset_id,series_label",frequency|variable_id|date,date,150,365,value,value

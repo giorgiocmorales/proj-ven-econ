@@ -83,7 +83,10 @@ download_latest_file <- function(url, dest_path, max_attempts = 3, timeout_secon
       return(dest_path)
     }
 
-    last_error <- "Downloaded file is empty"
+    # Preserve transport failures; only successful empty responses get this message.
+    if (ok) {
+      last_error <- "Downloaded file is empty"
+    }
     unlink(download_path)
 
     if (attempt < max_attempts) {

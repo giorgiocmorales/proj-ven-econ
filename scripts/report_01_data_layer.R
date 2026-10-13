@@ -72,10 +72,17 @@ gdp_imf <- readr::read_csv(
     downloaded_at = as.character(.data$downloaded_at)
   )
 
-inflation_bcv <- readr::read_csv(
-  "data/final/prices_02_inflation_bcv.csv",
-  show_col_types = FALSE
-) %>%
+# Use the current headline group table shared by the approved inflation graph scripts.
+cpi_headline <- readr::read_csv("data/processed/prices_03_cpi_groups_bcv.csv", show_col_types = FALSE) %>%
+  filter(.data$series_id == "headline") %>%
+  mutate(variable_id = "cpi_index", value = .data$cpi_index)
+headline_rates <- readr::read_csv("data/final/prices_04_inflation_groups_bcv.csv", show_col_types = FALSE) %>%
+  filter(.data$series_id == "headline")
+# December year-on-year inflation is the calendar-year change; do not annualize partial years.
+headline_annual <- headline_rates %>%
+  filter(.data$variable_id == "inflation_yoy", lubridate::month(.data$date) == 12L) %>%
+  mutate(variable_id = "inflation_calendar_year", frequency = "annual")
+inflation_bcv <- bind_rows(cpi_headline, headline_rates, headline_annual) %>%
   transmute(
     source_key = "cpi",
     source_series = .data$variable_id,
@@ -86,7 +93,8 @@ inflation_bcv <- readr::read_csv(
     source_id = .data$source_id,
     dataset_id = .data$dataset_id,
     source_url = .data$source_url,
-    downloaded_at = as.character(.data$downloaded_at)
+    # File modification metadata is not a download timestamp; the build manifest hashes inputs.
+    downloaded_at = NA_character_
   )
 
 fx_bcv <- readr::read_csv(
@@ -94,7 +102,7 @@ fx_bcv <- readr::read_csv(
   show_col_types = FALSE
 ) %>%
   pivot_longer(
-    cols = c("rate_indx_adj", "rate_yad"),
+    cols = c("rate_smc_adj", "rate_yad"),
     names_to = "source_series",
     values_to = "value"
   ) %>%
@@ -106,7 +114,7 @@ fx_bcv <- readr::read_csv(
     date = .data$date,
     value = .data$value,
     provisional = FALSE,
-    source_id = if_else(.data$source_series == "rate_indx_adj", "bcv", "yadio"),
+    source_id = if_else(.data$source_series == "rate_smc_adj", "bcv", "yadio"),
     dataset_id = "external_fx",
     source_url = NA_character_,
     downloaded_at = NA_character_
@@ -125,8 +133,10 @@ oil_production <- readr::read_csv(
     provisional = FALSE,
     source_id = .data$source_id,
     dataset_id = .data$dataset_id,
-    source_url = .data$source_url,
-    downloaded_at = as.character(.data$downloaded_at)
+    # The corpus provides publication vintages and PDF evidence, not download timestamps.
+    source_url = .data$source_pdf_url,
+    report_month = .data$report_month,
+    downloaded_at = NA_character_
   )
 
 oil_price <- readr::read_csv(
@@ -142,8 +152,10 @@ oil_price <- readr::read_csv(
     provisional = FALSE,
     source_id = .data$source_id,
     dataset_id = .data$dataset_id,
-    source_url = .data$source_url,
-    downloaded_at = as.character(.data$downloaded_at)
+    # Preserve the exact published vintage without inventing retrieval metadata.
+    source_url = .data$source_pdf_url,
+    report_month = .data$report_month,
+    downloaded_at = NA_character_
   )
 
 bop_goods <- readr::read_csv(
@@ -164,7 +176,7 @@ bop_goods <- readr::read_csv(
   )
 
 fiscal_balance <- readr::read_csv(
-  "data/processed/fiscal_02_bal_imf.csv",
+  "data/processed/fiscal_05_components_imf.csv",
   show_col_types = FALSE
 ) %>%
   transmute(
@@ -213,6 +225,7 @@ report_series <- source_data %>%
     source_url = .data$source_url,
     source_series = .data$source_series,
     source_frequency = .data$source_frequency,
+    report_month = .data$report_month,
     downloaded_at = .data$downloaded_at
   ) %>%
   arrange(.data$section, .data$variable_id, .data$date)

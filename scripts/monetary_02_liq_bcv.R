@@ -12,9 +12,11 @@ dataset_id <- "monetary_02_liq_bcv"
 source_id <- "bcv"
 source_url <- "https://bcv.org.ve/sites/default/files/indicadores_sector_monetario/liquidez_monetaria_semanal1.xls"
 raw_path <- file.path("data", "raw", "bcv_liq.xls")
-downloaded_at <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+offline <- identical(Sys.getenv("BCV_MONETARY_OFFLINE"), "true")
+# An offline rebuild retains the raw workbook's retrieval time instead of inventing one.
+downloaded_at <- format(if (offline) file.info(raw_path)$mtime else Sys.time(), "%Y-%m-%d %H:%M:%S")
 
-download_latest_file(
+if (!offline) download_latest_file(
   url = source_url,
   dest_path = raw_path,
   max_attempts = 3,

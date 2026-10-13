@@ -3,7 +3,8 @@
 library(tidyverse)
 Sys.setlocale("LC_CTYPE", ".UTF-8")
 source("R/report_figures.R", encoding = "UTF-8")
-config <- yaml::read_yaml(Sys.getenv("REPORT_CONFIG", "config/report.yml"))
+source("R/report_inputs.R")
+config <- read_report_config(path = Sys.getenv("REPORT_CONFIG", "config/report.yml"))
 cutoff <- as.Date(config$params$data_cutoff)
 history_start <- as.Date("2020-01-01")
 
@@ -110,8 +111,8 @@ real_figure <- chart_data %>%
     subtitle = paste0("Billones de bolívares (10¹²), a precios de ", format(reference_date, "%m/%Y"),
       " | ", format(min(chart_data$date), "%m/%Y"), "–", format(last_date, "%m/%Y")),
     x = NULL, y = NULL,
-    caption = paste0("Fuente: BCV; saldos homologados por reconversión y deflactados con el INPC general.\n",
-      "IPC diario estimado por capitalización constante dentro de cada mes; índices mensuales anclados al cierre.")) +
+    caption = paste0("Notas: IPC diario estimado por capitalización constante dentro de cada mes; índices mensuales anclados al cierre.\n",
+      "Fuentes: BCV; saldos homologados por reconversión y deflactados con el INPC general.")) +
   report_chart_theme + guides(color = guide_legend(nrow = 1))
 growth_figure <- chart_data %>%
   ggplot(aes(date, nominal_growth_yoy, color = series)) + geom_line(linewidth = 0.7) +
@@ -125,8 +126,8 @@ growth_figure <- chart_data %>%
     subtitle = paste0("Variación de saldos nominales en 52 semanas (%) | ",
       format(min(chart_data$date), "%m/%Y"), "–", format(last_date, "%m/%Y")),
     x = NULL, y = NULL,
-    caption = paste0("Fuente: BCV; cálculos sobre saldos nominales homologados por reconversión.\n",
-      "Comparación a 364 días; si falta esa fecha, última observación anterior (máximo 7 días). Cifras provisionales.")) +
+    caption = paste0("Notas: comparación a 364 días; si falta esa fecha, última observación anterior (máximo 7 días). Cifras provisionales.\n",
+      "Fuentes: BCV; cálculos sobre saldos nominales homologados por reconversión.")) +
   report_chart_theme + guides(color = guide_legend(nrow = 1))
 figures <- list(monetary_base_liquidity_real = real_figure, monetary_base_liquidity_growth_yoy = growth_figure)
 for (name in names(figures)) {

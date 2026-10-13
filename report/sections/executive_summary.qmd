@@ -1,0 +1,39 @@
+## Resumen ejecutivo
+
+::: {custom-style="Compact"}
+**Responsable:** Eco. Giorgio Cunto Morales
+
+**Cliente:** `r params$client` · **Corte de datos:** `r params$data_cutoff`
+:::
+
+**[Párrafo 1: actividad, inflación y tipo de cambio.]** Sintetizar los principales cambios del período y sus implicaciones para la operación del cliente. Destacar únicamente cifras verificadas y distinguir los datos observados de las estimaciones y perspectivas.
+
+**[Párrafo 2: petróleo, sector externo y situación fiscal.]** Integrar las condiciones de generación de divisas, ingresos públicos y riesgos relevantes. Cerrar con una valoración breve de las perspectivas y de las decisiones que estos resultados podrían afectar.
+
+**Consideraciones principales**
+
+- [Implicación para demanda, ventas y planificación comercial.]
+- [Implicación para costos, precios y disponibilidad de divisas.]
+- [Riesgo o condición que podría modificar el escenario.]
+
+{{< pagebreak >}}
+
+### Indicadores principales y perspectivas
+
+```{r}
+#| label: executive-summary-table
+#| results: asis
+
+# Keep units beside each indicator and display unfinished cells compactly.
+executive_table %>%
+  mutate(Indicador = paste0(.data$Indicador, " (", .data$Unidad, ")")) %>%
+  select(-.data$Unidad) %>%
+  mutate(across(-.data$Indicador, ~ replace(.x, .x == "Pendiente", "\u2014"))) %>%
+  knitr::kable(align = c("l", "r", "r", "r"), row.names = FALSE)
+```
+
+*Notas: el cierre utiliza el último dato de diciembre para precios y saldos, y el dato anual para crecimiento, inflación y flujos. — indica una serie aún no incorporada a la tabla o un resultado del modelo por desarrollar. Las columnas estimada y proyectada no contienen pronósticos. MM USD: millones de dólares; Bn Bs.: billones de bolívares.*
+
+*Fuentes: BCV, OPEP y FMI; series verificadas del informe.*
+
+{{< pagebreak >}}

@@ -1,0 +1,19 @@
+## Precio y Producción Petrolera
+
+**[Análisis: uno o dos párrafos.]** Describir la producción y el precio del crudo, sus restricciones y la incidencia sobre la generación de divisas. Comparar las fuentes secundarias de la OPEP con la comunicación directa y el marcador Merey con WTI y Brent. Precisar el último mes disponible; los gráficos no extrapolan hasta el corte del informe.
+
+```{r}
+#| label: oil-production-figure
+
+# Display the production chart exported by the standardized oil graph script.
+knitr::include_graphics(report_graphs[["oil_production"]], rel_path = FALSE)
+```
+
+```{r}
+#| label: oil-prices-figure
+
+# Display the benchmark price chart from the same validated OPEC observations.
+knitr::include_graphics(report_graphs[["oil_prices"]], rel_path = FALSE)
+```
+
+{{< pagebreak >}}

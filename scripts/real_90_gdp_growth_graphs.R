@@ -12,6 +12,10 @@ if (.Platform$OS.type == "windows" && !l10n_info()[["UTF-8"]]) {
   }
 }
 source("R/report_figures.R", encoding = "UTF-8")
+source("R/report_inputs.R")
+# Keep annual observations within the report's completed-month analysis window.
+config <- read_report_config(path = Sys.getenv("REPORT_CONFIG", "config/report.yml"))
+cutoff <- as.Date(config$params$data_cutoff)
 
 # Use official historical growth through 2007 and the revised activity series from 2008.
 # Historical growth was calculated within the 1997 price base by the source pipeline.
@@ -37,7 +41,8 @@ bcv_growth <- readr::read_csv(
   )
 
 # Fail explicitly if coverage, numeric values, or annual uniqueness is invalid.
-gdp_growth <- bind_rows(historical_growth, bcv_growth) %>% arrange(.data$year)
+gdp_growth <- bind_rows(historical_growth, bcv_growth) %>%
+  filter(lubridate::make_date(.data$year, 12L, 31L) <= cutoff) %>% arrange(.data$year)
 if (!identical(gdp_growth$year, 1999:2025) || any(!is.finite(gdp_growth$growth))) {
   rlang::abort("GDP graph requires exactly one finite observation for every year 1999-2025",
                class = "gdp_graph_data_error")
@@ -73,8 +78,8 @@ gdp_growth_figure <- gdp_growth %>%
     subtitle = "Variaci\u00f3n interanual (%) | 1999\u20132025",
     x = NULL, y = NULL,
     caption = paste0(
-      "Fuente: BCV; serie hist\u00f3rica (1999\u20132007) y serie revisada (2008\u20132025).\n",
-      "Nota: revisiones distintas; cifras BCV 2017\u20132025 provisionales."
+      "Notas: revisiones distintas; cifras BCV 2017\u20132025 provisionales.\n",
+      "Fuentes: BCV; serie hist\u00f3rica (1999\u20132007) y serie revisada (2008\u20132025)."
     )
   ) +
   report_chart_theme +
