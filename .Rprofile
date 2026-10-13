@@ -1,3 +1,4 @@
+source("renv/activate.R")
 if (requireNamespace("here", quietly = TRUE)) {
   try(here::i_am("README.md"), silent = TRUE)
 }

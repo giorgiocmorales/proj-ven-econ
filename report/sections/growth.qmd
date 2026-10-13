@@ -1,0 +1,14 @@
+## Crecimiento y Producto Interno Bruto
+
+**[Análisis: uno o dos párrafos.]** Explicar el comportamiento anual y trimestral del PIB publicado por el BCV, los principales motores y restricciones de la actividad y sus implicaciones para el cliente. Las tasas trimestrales son interanuales; no confundirlas con tasas respecto al trimestre anterior. Añadir los supuestos de recuperación cuando esté disponible el módulo de escenarios.
+
+```{r}
+#| label: growth-figure
+
+# Reuse the annual/quarterly comparison produced by the standardized GDP graph script.
+knitr::include_graphics(report_graphs[["growth"]], rel_path = FALSE)
+```
+
+**[Segundo gráfico pendiente: recuperación del PIB por habitante.]** Definir el nivel de referencia y las trayectorias de crecimiento antes de incorporar el panel de escenarios.
+
+{{< pagebreak >}}

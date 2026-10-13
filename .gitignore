@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+/Rplots.pdf
 
 renv/library/
 renv/staging/
@@ -10,8 +11,12 @@ data/
 output/
 outputs/
 references/pdfs/
+tmp/
 
 reports/_site/
 
 .DS_Store
 Thumbs.db
+
+/.quarto/
+**/*.quarto_ipynb

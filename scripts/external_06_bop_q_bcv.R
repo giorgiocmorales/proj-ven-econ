@@ -11,7 +11,7 @@ ensure_project_dirs()
 dataset_id <- "external_06_bop_q_bcv"
 source_id <- "bcv"
 source_url <- "https://bcv.org.ve/sites/default/files/indicadores_sector_externo/2_4_1_t.xls"
-raw_path <- file.path("data", "raw", "bcv_bop_q.xlsx")
+raw_path <- file.path("data", "raw", "bcv_bop_q.xls")
 
 downloaded_at <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
 download_latest_file(source_url, raw_path)

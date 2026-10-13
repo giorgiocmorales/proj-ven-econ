@@ -14,7 +14,7 @@ opec_raw_dir <- function(report_month) {
   file.path("data", "raw", "opec", opec_report_slug(report_month))
 }
 
-opec_download_report <- function(report) {
+opec_download_report <- function(report, download_appendix = FALSE) {
   report_month <- as.Date(report$report_month[[1]])
   raw_dir <- opec_raw_dir(report_month)
   dir.create(raw_dir, recursive = TRUE, showWarnings = FALSE)
@@ -22,8 +22,17 @@ opec_download_report <- function(report) {
   appendix_path <- file.path(raw_dir, "appendix.xlsx")
   pdf_path <- file.path(raw_dir, "momr.pdf")
 
-  if (!is.na(report$appendix_url[[1]]) && nzchar(report$appendix_url[[1]])) {
-    download_latest_file(report$appendix_url[[1]], appendix_path)
+  if (download_appendix && !is.na(report$appendix_url[[1]]) && nzchar(report$appendix_url[[1]])) {
+    # The production and price extractors consume the PDF only. Some archive
+    # reports do not expose a matching appendix, so do not block a valid PDF
+    # extraction when its optional appendix download fails.
+    tryCatch(
+      download_latest_file(report$appendix_url[[1]], appendix_path),
+      error = function(e) {
+        message(sprintf("Optional OPEC appendix unavailable: %s", report$appendix_url[[1]]))
+        NULL
+      }
+    )
   }
 
   if (!is.na(report$pdf_url[[1]]) && nzchar(report$pdf_url[[1]])) {
@@ -93,16 +102,40 @@ opec_period_type <- function(period) {
   )
 }
 
-extract_opec_venezuela_line <- function(text, source_type) {
+extract_opec_venezuela_line <- function(text, source_type, observation_month = NULL) {
+  # Select the requested table explicitly; never reuse a secondary row as direct data.
+  source_heading <- switch(source_type,
+    secondary_sources = "secondary sources",
+    direct_communication = "direct communication",
+    stop(sprintf("Unknown production source: %s", source_type))
+  )
+  heading <- stringr::str_locate(text, stringr::regex(
+    paste0("Table[^\\n]*crude oil production[^\\n]*", source_heading), ignore_case = TRUE
+  ))
+  if (is.na(heading[1, 1])) {
+    stop(sprintf("Missing production table heading for %s", source_type))
+  }
+  text <- stringr::str_sub(text, heading[1, 2] + 1L)
+  next_table <- stringr::str_locate(text, "Table [0-9]")
+  if (!is.na(next_table[1, 1])) {
+    text <- stringr::str_sub(text, 1L, next_table[1, 1] - 1L)
+  }
   pattern <- "Venezuela\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+([0-9,.]+|\\.\\.)\\s+(-?[0-9,.]+|\\.\\.)"
   matches <- stringr::str_match_all(text, pattern)[[1]]
 
-  if (nrow(matches) == 0) {
+  if (nrow(matches) != 1) {
     stop(sprintf("Could not find Venezuela production row for %s", source_type))
   }
 
   values <- matches[ifelse(source_type == "secondary_sources", 1L, nrow(matches)), 2:10]
-  periods <- c("2024", "2025", "q_minus_2", "q_minus_1", "q_current", "m_minus_2", "m_minus_1", "m_current", "mom_change")
+  annual_periods <- if (is.null(observation_month)) {
+    c("2024", "2025")
+  } else {
+    report_year <- as.integer(format(as.Date(observation_month), "%Y"))
+    as.character(c(report_year - 2L, report_year - 1L))
+  }
+
+  periods <- c(annual_periods, "q_minus_2", "q_minus_1", "q_current", "m_minus_2", "m_minus_1", "m_current", "mom_change")
 
   tibble::tibble(period = periods, value = parse_opec_number(values)) |>
     dplyr::mutate(

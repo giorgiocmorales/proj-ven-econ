@@ -1,0 +1,5 @@
+frequency,row_id,series_label,variable_id,display_label,source_sign
+annual,10,Exportaciones de bienes f.o.b.,goods_exports_fob,Exports of goods f.o.b.,1
+annual,13,Importaciones de bienes f.o.b.,goods_imports_fob,Imports of goods f.o.b.,-1
+quarterly,11,Exportaciones de bienes f.o.b.,goods_exports_fob,Exports of goods f.o.b.,1
+quarterly,14,Importaciones de bienes f.o.b.,goods_imports_fob,Imports of goods f.o.b.,-1
