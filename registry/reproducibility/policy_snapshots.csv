@@ -1,0 +1,3 @@
+provider,policy_url,sha256,marker_verified,snapshot_file
+IMF,https://www.imf.org/en/about/copyright-and-terms,c1d932fb11f68f22c37e576486d5674e1a6edba729e8fae6f24355155dabf0b8,TRUE,D:/Documents/6_Data Science/Portfolio/proj-ven-econ/data/reproducibility/policies\policies-2a1e8307b4afb/IMF.html
+World_Bank,https://datacatalog.worldbank.org/public-licenses,c7c9b31441ea4a1fa27990f4b11f385587469c5c2bda4ec4fc7a6561db6d2422,TRUE,D:/Documents/6_Data Science/Portfolio/proj-ven-econ/data/reproducibility/policies\policies-2a1e8307b4afb/World_Bank.html

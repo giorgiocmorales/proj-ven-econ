@@ -1,0 +1,25 @@
+# Merchandise trade in current USD; each product is downloaded independently.
+# Copy this profile for another country or product list instead of editing R code.
+country_code: 862
+frequency: A
+start_period: "2000"
+end_period: "2024"
+classification: HS
+products: ["TOTAL"]
+include_direct: true
+include_mirror: true
+
+# public_preview needs no key and is capped at 500 records per request.
+# authenticated uses COMTRADE_PRIMARY from the environment, sent in a redacted header.
+access: public_preview
+max_records: 500
+request_interval_seconds: 1.2
+timeout_seconds: 60
+max_attempts: 3
+raw_directory: data/raw/comtrade
+dataset_id: external_14_trade_comtrade
+
+# For monthly data, use frequency M and YYYYMM periods (for example 202001 to 202609).
+# HS uses each reporter's original HS edition; product codes are not concorded over time.
+# TOTAL covers merchandise only. No services, interpolation, or CIF/FOB adjustments.
+# Extend end_period for later years; resume preserves completed requests after quota errors.

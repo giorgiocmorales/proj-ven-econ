@@ -13,10 +13,10 @@ source_id <- "bcv"
 source_url <- "https://bcv.org.ve/sites/default/files/cuentas_macroeconomicas/5_2_4_ae_trim.xlsx"
 raw_path <- file.path("data", "raw", "bcv_gdp_q_a.xlsx")
 
-downloaded_at <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
 download_latest_file(source_url, raw_path)
+downloaded_at <- source_retrieval_time(raw_path, dataset_id)
 
-gdp_sheet <- read_bcv_sheet(raw_path, sheet = "Var_pun%T", col_names = FALSE) %>%
+gdp_sheet <- read_bcv_sheet(raw_path, sheet = "Var_pun%", col_names = FALSE) %>%
   as_tibble(.name_repair = "unique")
 
 quarter_map <- tibble(
@@ -54,9 +54,9 @@ gdp_q_activity_raw <- gdp_sheet %>%
     dataset_id = dataset_id,
     source_id = source_id,
     source_url = source_url,
-    sheet_name = "Var_pun%T",
+    sheet_name = "Var_pun%",
     downloaded_at = downloaded_at
   ) %>%
   filter(!is.na(value))
 
-write_processed_dataset(gdp_q_activity_raw, dataset_id)
+write_final_dataset(gdp_q_activity_raw, dataset_id)

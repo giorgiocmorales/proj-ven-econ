@@ -1,0 +1,225 @@
+source_id,source_file,sheet_name,row_number,column_number,matched
+interest_rate_documents,data/raw/interest_rates_bcv/1_1_6_diario_532.xlsx,COMB. DE PERIODOS CONSOLIDADO,1,2,TRUE
+interest_rate_documents,data/raw/interest_rates_bcv/1_1_6_diario_532.xlsx,1_1_6 (Diario),1,2,TRUE
+interest_rate_documents,data/raw/interest_rates_bcv/1_1_7_diario_nuevo.xlsx,1_1_7 (Diario),1,2,TRUE
+interest_rate_documents,data/raw/interest_rates_bcv/1_1_8_diario.xlsx,1_1_8 (Diario),1,2,TRUE
+interest_rate_documents,data/raw/interest_rates_bcv/1_1_9_diario.xlsx,1_1_9 (Diario),1,1,TRUE
+interest_rate_documents,data/raw/interest_rates_bcv/1_2_15_semanal.xlsx,1_2_15 (semanal),1,2,TRUE
+interest_rate_documents,data/raw/interest_rates_bcv/1_3_35.xls,1_3_35,2,1,TRUE
+interest_rate_documents,data/raw/interest_rates_bcv/1_1_6_diario_532.xlsx,COMB. DE PERIODOS CONSOLIDADO,917,2,TRUE
+interest_rate_documents,data/raw/interest_rates_bcv/1_1_6_diario_532.xlsx,1_1_6 (Diario),5536,2,TRUE
+interest_rate_documents,data/raw/interest_rates_bcv/1_1_7_diario_nuevo.xlsx,1_1_7 (Diario),5540,2,TRUE
+interest_rate_documents,data/raw/interest_rates_bcv/1_1_8_diario.xlsx,1_1_8 (Diario),3972,2,TRUE
+interest_rate_documents,data/raw/interest_rates_bcv/1_1_9_diario.xlsx,1_1_9 (Diario),3967,1,TRUE
+interest_rate_documents,data/raw/interest_rates_bcv/1_2_15_semanal.xlsx,1_2_15 (semanal),1259,2,TRUE
+interest_rate_documents,data/raw/interest_rates_bcv/1_3_35.xls,1_3_35,255,1,TRUE
+pib_hist_workbook,data/raw/pib_hist.xlsx,PIB Historico,1,1,TRUE
+pib_hist_workbook,data/raw/pib_hist.xlsx,poblacion,1,1,TRUE
+pib_hist_workbook,data/raw/pib_hist.xlsx,ppc,1,1,TRUE
+pib_hist_workbook,data/raw/pib_hist.xlsx,Milagros económicos,1,1,TRUE
+pib_hist_workbook,data/raw/pib_hist.xlsx,PIB Historico,522,2,TRUE
+pib_hist_workbook,data/raw/pib_hist.xlsx,poblacion,195,10,TRUE
+pib_hist_workbook,data/raw/pib_hist.xlsx,ppc,502,1,TRUE
+pib_hist_workbook,data/raw/pib_hist.xlsx,Milagros económicos,272,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Contents,2,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Total Energy Supply (TES) -EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,TES by fuel,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,TES per Capita,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,CO2 from Energy,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Natural Gas Flaring,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,CO2 from Flaring,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,"CO2-Process Emissions, Methane",1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,CO2e Emissions ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,CCUS Capture Capacity,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Carbon Prices,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil - Proved reserves,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil - Proved reserves history,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil Production - barrels,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil Production - tonnes,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Crude+cond production - barrels,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,NGLs production - barrels,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Liquids Consumption - barrels,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil Consumption - barrels,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil Consumption - Tonnes,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil Consumption - EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil - Regional Consumption,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Spot crude prices,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil crude prices since 1861,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil refinery - capacity,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil refinery - throughput,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil - Regional refining margins,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil trade movements,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil - Trade movements in 24-25,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil - Inter-area movements,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas - Proved reserves,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas - Proved reserves history,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Production - Bcm,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Production - bcf,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Production - EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Consumption - Bcm,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Consumption - Bcf,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Consumption - EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas - H2 Production Capacity,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Prices ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas - Trade movements,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas - LNG imports bcm,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas - LNG exports bcm,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas trade 2025 - LNG,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas trade 2025 - pipeline,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal - Reserves,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal Production - mt,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal Production - EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal Consumption - EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal & Uranium - Prices,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal - Trade movements,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal trade movements 2025,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Nuclear Generation - TWh,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Nuclear Consumption - EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Hydro Generation - TWh,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Hydro Consumption - EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Renewables Consumption -EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Renewables Cons (incl hydro -EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Renewable Power (inc hydro) -EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Ren power (excl hydro) - EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Renewable Power (inc hydro)-TWh,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Ren power (excl hydro) - TWh,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Renewables Generation by Source,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Solar Generation - TWh,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Solar Consumption - EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Solar Installed Capacity,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Solar -  behind-the-meter,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Wind Generation - TWh,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Wind Consumption - EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Wind Installed Capacity,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Wind and Solar Technology Types,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Geo Biomass Other - TWh,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Geo Biomass Other - EJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Biofuels production - kboed,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Biofuels production - PJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Biofuels Consumption - kboed,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Biofuels consumption - PJ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,SAF prices,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Electricity Generation - TWh,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Elec generation by fuel,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil inputs - Elec generation ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas inputs - Elec generation,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal inputs - Elec generation ,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Other inputs - Elec generation,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Grid Scale BESS Capacity,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Data Centre Demand,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Cobalt P-R,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Lithium P-R,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Natural Graphite P-R,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Rare Earth metals P-R,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Copper P-R,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Manganese P-R,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Nickel P-R,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Zinc P-R,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,PGM,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Bauxite,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Tin,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Vanadium,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Mineral Commodity Prices,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Approximate conversion factors,1,9,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Definitions,1,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Contents,122,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Total Energy Supply (TES) -EJ,123,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,TES by fuel,99,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,TES per Capita,124,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,CO2 from Energy,124,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Natural Gas Flaring,88,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,CO2 from Flaring,88,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,"CO2-Process Emissions, Methane",123,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,CO2e Emissions ,112,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,CCUS Capture Capacity,41,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Carbon Prices,20,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil - Proved reserves,103,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil - Proved reserves history,104,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil Production - barrels,90,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil Production - tonnes,90,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Crude+cond production - barrels,87,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,NGLs production - barrels,86,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Liquids Consumption - barrels,124,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil Consumption - barrels,124,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil Consumption - Tonnes,124,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil Consumption - EJ,124,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil - Regional Consumption,217,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Spot crude prices,64,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil crude prices since 1861,175,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil refinery - capacity,109,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil refinery - throughput,109,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil - Regional refining margins,37,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil trade movements,35,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil - Trade movements in 24-25,56,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil - Inter-area movements,55,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas - Proved reserves,95,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas - Proved reserves history,96,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Production - Bcm,89,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Production - bcf,88,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Production - EJ,87,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Consumption - Bcm,124,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Consumption - Bcf,122,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Consumption - EJ,122,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas - H2 Production Capacity,47,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas Prices ,56,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas - Trade movements,115,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas - LNG imports bcm,44,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas - LNG exports bcm,38,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas trade 2025 - LNG,43,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas trade 2025 - pipeline,36,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal - Reserves,76,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal Production - mt,70,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal Production - EJ,70,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal Consumption - EJ,124,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal & Uranium - Prices,54,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal - Trade movements,40,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal trade movements 2025,21,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Nuclear Generation - TWh,122,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Nuclear Consumption - EJ,123,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Hydro Generation - TWh,122,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Hydro Consumption - EJ,123,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Renewables Consumption -EJ,123,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Renewables Cons (incl hydro -EJ,123,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Renewable Power (inc hydro) -EJ,123,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Ren power (excl hydro) - EJ,123,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Renewable Power (inc hydro)-TWh,122,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Ren power (excl hydro) - TWh,122,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Renewables Generation by Source,120,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Solar Generation - TWh,122,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Solar Consumption - EJ,123,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Solar Installed Capacity,83,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Solar -  behind-the-meter,67,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Wind Generation - TWh,122,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Wind Consumption - EJ,123,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Wind Installed Capacity,82,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Wind and Solar Technology Types,86,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Geo Biomass Other - TWh,122,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Geo Biomass Other - EJ,123,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Biofuels production - kboed,87,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Biofuels production - PJ,87,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Biofuels Consumption - kboed,88,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Biofuels consumption - PJ,88,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,SAF prices,11,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Electricity Generation - TWh,119,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Elec generation by fuel,64,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Oil inputs - Elec generation ,65,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Gas inputs - Elec generation,65,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Coal inputs - Elec generation ,65,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Other inputs - Elec generation,65,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Grid Scale BESS Capacity,100,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Data Centre Demand,19,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Cobalt P-R,24,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Lithium P-R,19,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Natural Graphite P-R,25,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Rare Earth metals P-R,20,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Copper P-R,15,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Manganese P-R,14,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Nickel P-R,15,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Zinc P-R,15,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,PGM,14,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Bauxite,16,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Tin,18,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Vanadium,13,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Mineral Commodity Prices,42,1,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Approximate conversion factors,40,11,TRUE
+energy_institute_workbook,data/raw/EI-Stats-Review-ALL-data.xlsx,Definitions,59,1,TRUE

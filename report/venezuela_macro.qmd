@@ -1,0 +1,51 @@
+---
+metadata-files:
+  - ../config/report.yml
+filters:
+  - docx_layout.lua
+format:
+  pdf:
+    documentclass: article
+    mainfont: Arial
+    sansfont: Arial
+    fontsize: 11pt
+    geometry:
+      - margin=1in
+    keep-tex: true
+    fig-pos: H
+  docx:
+    reference-doc: templates/estevez_format.docx
+    toc: false
+    fig-dpi: 300
+execute:
+  echo: false
+  warning: false
+  message: false
+  fig-width: 6.5
+  fig-height: 2.7
+  fig-align: center
+  out-width: 100%
+editor: visual
+---
+
+```{r}
+#| label: setup
+
+# Keep automated preparation outside the analyst-editable report sections.
+source(here::here("R", "report_build.R"), encoding = "UTF-8")
+```
+
+<!-- Each section owns its analysis placeholders, chart slots, and page breaks. -->
+{{< include sections/executive_summary.qmd >}}
+
+{{< include sections/growth.qmd >}}
+
+{{< include sections/inflation_exchange_rate.qmd >}}
+
+{{< include sections/monetary.qmd >}}
+
+{{< include sections/oil.qmd >}}
+
+{{< include sections/external.qmd >}}
+
+{{< include sections/fiscal.qmd >}}

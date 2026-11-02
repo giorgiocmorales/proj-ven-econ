@@ -1,12 +1,13 @@
 ensure_project_dirs <- function() {
   dirs <- c(
     "data/raw",
-    "data/processed",
+    "data/interim",
     "data/final",
     "data/manual_fix",
     "registry",
     "output",
     "outputs",
+    "outputs/data",
     "output/figures",
     "outputs/figures"
   )
@@ -14,46 +15,186 @@ ensure_project_dirs <- function() {
   invisible(lapply(dirs, dir.create, recursive = TRUE, showWarnings = FALSE))
 }
 
+# Resolve acquisition intent independently of the dataset transformation.
+source_acquisition_mode <- function() {
+  fallback <- if (is.function(getOption("repro.download"))) "update" else "resume"
+  mode <- getOption("pipeline.mode", Sys.getenv("PIPELINE_MODE", fallback))
+  if (length(mode) != 1L || !mode %in% c("rebuild", "resume", "update")) {
+    rlang::abort("Acquisition mode must be rebuild, resume or update", class = "source_mode_error")
+  }
+  mode
+}
+
+# Preserve an acquired version before changing a raw convenience path.
+archive_source_file <- function(path) {
+  if (!file.exists(path) || file.info(path)$size == 0) {
+    rlang::abort(paste("Missing or empty source", path), class = "source_cache_error")
+  }
+  hash <- digest::digest(file = path, algo = "sha256")
+  destination <- file.path("data/raw/vintages", substr(hash, 1L, 2L), paste0(hash, ".", tools::file_ext(path)))
+  dir.create(dirname(destination), recursive = TRUE, showWarnings = FALSE)
+  if (!file.exists(destination) && !file.copy(path, destination, copy.date = TRUE)) {
+    rlang::abort(paste("Cannot preserve source", path), class = "source_archive_error")
+  }
+  if (digest::digest(file = destination, algo = "sha256") != hash) {
+    rlang::abort(paste("Source archive checksum mismatch", destination), class = "source_archive_error")
+  }
+  invisible(destination)
+}
+
+# Retain prior acquisition metadata on rebuilds; generation time is not retrieval time.
+source_retrieval_time <- function(path, dataset_id) {
+  ledger_path <- "data/raw/acquisitions.csv"
+  if (file.exists(ledger_path) && file.exists(path)) {
+    ledger <- readr::read_csv(ledger_path, show_col_types = FALSE,
+      col_types = readr::cols(.default = readr::col_character()))
+    matched <- ledger[ledger$path == path & ledger$sha256 == digest::digest(file = path, algo = "sha256"), ]
+    if (nrow(matched)) return(tail(matched$retrieved_at, 1L))
+  }
+  prior_path <- file.path("data/final", paste0(dataset_id, ".csv"))
+  if (source_acquisition_mode() != "update" && file.exists(prior_path)) {
+    prior <- readr::read_csv(prior_path, show_col_types = FALSE,
+      col_types = readr::cols(.default = readr::col_character()))
+    if ("downloaded_at" %in% names(prior)) {
+      timestamps <- unique(prior$downloaded_at[!is.na(prior$downloaded_at)])
+      if (length(timestamps) == 1L) return(timestamps)
+    }
+  }
+  NA_character_
+}
+
+# Reuse preserved API extracts when original response bytes are unavailable historically.
+cached_api_source <- function(dataset_id) {
+  registry <- readr::read_csv("registry/series_registry.csv", show_col_types = FALSE)
+  legacy <- registry$raw_file[registry$dataset_id == dataset_id]
+  candidates <- c(file.path("data/raw", paste0(dataset_id, ".csv")),
+    legacy[grepl("[.]csv$", legacy)], file.path("data/final", paste0(dataset_id, ".csv")))
+  path <- candidates[file.exists(candidates)][1]
+  mode <- source_acquisition_mode()
+  if (mode == "update") return(NULL)
+  # New acquisitions retain complete provider bytes and can be reparsed on rebuild.
+  if (length(list.files(file.path("data/raw/api", dataset_id), pattern = "[.](json|xml)$"))) return(NULL)
+  if (is.na(path)) {
+    if (mode == "rebuild") rlang::abort(paste("Missing cached API extract", dataset_id), class = "source_cache_error")
+    return(NULL)
+  }
+  data <- readr::read_csv(path, show_col_types = FALSE)
+  readr::stop_for_problems(data)
+  if (!nrow(data) || !all(c("dataset_id", "source_id", "date", "target_variable") %in% names(data))) {
+    rlang::abort(paste("Invalid cached API extract", path), class = "source_cache_error")
+  }
+  if (any(data$dataset_id != dataset_id)) {
+    data <- data %>% dplyr::mutate(source_dataset_id = .data$dataset_id, dataset_id = .env$dataset_id)
+  }
+  list(data = data, errors = tibble::tibble())
+}
+
 download_latest_file <- function(url, dest_path, max_attempts = 3, timeout_seconds = 120) {
+  # Rebuilds never fetch; resume fetches only missing files; updates check revisions.
+  mode <- source_acquisition_mode()
+  if (mode != "update" && file.exists(dest_path) && file.info(dest_path)$size > 0) return(dest_path)
+  if (mode == "rebuild") {
+    rlang::abort(paste("Missing offline source", dest_path), class = "source_cache_error")
+  }
+  # The reproducibility runner captures/replays exact responses in a private run.
+  transport <- getOption("repro.download")
+  if (is.function(transport)) return(transport(url, dest_path, max_attempts, timeout_seconds))
   ensure_project_dirs()
+
+  dest_dir <- dirname(dest_path)
+  dir.create(dest_dir, recursive = TRUE, showWarnings = FALSE)
 
   timeout_old <- getOption("timeout")
   on.exit(options(timeout = timeout_old), add = TRUE)
   options(timeout = timeout_seconds)
 
-  if (file.exists(dest_path)) {
-    unlink(dest_path)
-  }
+  download_path <- tempfile(
+    pattern = paste0(".", basename(dest_path), "_"),
+    tmpdir = dest_dir,
+    fileext = ".download"
+  )
+  backup_path <- tempfile(
+    pattern = paste0(".", basename(dest_path), "_"),
+    tmpdir = dest_dir,
+    fileext = ".backup"
+  )
+  on.exit(unlink(download_path), add = TRUE)
+  on.exit(unlink(backup_path), add = TRUE)
+
+  last_error <- NULL
 
   for (attempt in seq_len(max_attempts)) {
     ok <- tryCatch(
       {
-        download.file(
+        download_status <- download.file(
           url = url,
-          destfile = dest_path,
+          destfile = download_path,
           mode = "wb",
           quiet = TRUE,
           method = "libcurl"
         )
+
+        if (download_status != 0) {
+          stop(sprintf("Download returned status %s", download_status))
+        }
+
         TRUE
       },
-      error = function(e) FALSE
+      error = function(e) {
+        last_error <<- conditionMessage(e)
+        FALSE
+      }
     )
 
-    if (ok && file.exists(dest_path) && file.info(dest_path)$size > 0) {
+    if (ok && file.exists(download_path) && file.info(download_path)$size > 0) {
+      if (file.exists(dest_path)) archive_source_file(dest_path)
+      archive_source_file(download_path)
+      if (file.exists(dest_path) && !file.rename(dest_path, backup_path)) {
+        stop(sprintf("Could not preserve existing file before refresh: %s", dest_path), call. = FALSE)
+      }
+
+      if (!file.rename(download_path, dest_path)) {
+        if (file.exists(backup_path) && !file.rename(backup_path, dest_path)) {
+          stop(sprintf("Could not restore existing file after refresh failure: %s", dest_path), call. = FALSE)
+        }
+
+        stop(sprintf("Could not promote refreshed download: %s", dest_path), call. = FALSE)
+      }
+
+      if (file.exists(backup_path)) {
+        unlink(backup_path)
+      }
+
+      # Record actual acquisition only; cache reads never fabricate a new download time.
+      receipt <- tibble::tibble(path = dest_path, url = url,
+        sha256 = digest::digest(file = dest_path, algo = "sha256"),
+        retrieved_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"))
+      ledger <- "data/raw/acquisitions.csv"
+      readr::write_csv(receipt, ledger, append = file.exists(ledger))
+
       return(dest_path)
     }
 
-    if (file.exists(dest_path)) {
-      unlink(dest_path)
+    # Preserve transport failures; only successful empty responses get this message.
+    if (ok) {
+      last_error <- "Downloaded file is empty"
     }
+    unlink(download_path)
 
     if (attempt < max_attempts) {
       Sys.sleep(1.5 * attempt)
     }
   }
 
-  stop(sprintf("Download failed after %s attempts: %s", max_attempts, basename(dest_path)))
+  stop(
+    sprintf(
+      "Download failed after %s attempts: %s. Last error: %s",
+      max_attempts,
+      basename(dest_path),
+      last_error
+    ),
+    call. = FALSE
+  )
 }
 
 stack_excel_workbook <- function(file_path) {
@@ -138,6 +279,23 @@ parse_bcv_date <- function(x) {
   x_chr <- stringr::str_remove_all(x_chr, "\\(\\*\\)|\\*")
   x_chr <- stringr::str_replace_all(x_chr, "/+", "/")
   x_chr <- stringr::str_trim(x_chr)
+
+  # Normalize Spanish month names because the runtime locale may not parse them.
+  spanish_month_patterns <- c(
+    "(?i)\\bene(?:ro)?\\b" = "01",
+    "(?i)\\bfeb(?:rero)?\\b" = "02",
+    "(?i)\\bmar(?:zo)?\\b" = "03",
+    "(?i)\\babr(?:il)?\\b" = "04",
+    "(?i)\\bmay(?:o)?\\b" = "05",
+    "(?i)\\bjun(?:io)?\\b" = "06",
+    "(?i)\\bjul(?:io)?\\b" = "07",
+    "(?i)\\bago(?:sto)?\\b" = "08",
+    "(?i)\\b(?:sep|set)(?:tiembre)?\\b" = "09",
+    "(?i)\\boct(?:ubre)?\\b" = "10",
+    "(?i)\\bnov(?:iembre)?\\b" = "11",
+    "(?i)\\bdic(?:iembre)?\\b" = "12"
+  )
+  x_chr <- stringr::str_replace_all(x_chr, spanish_month_patterns)
 
   serial <- suppressWarnings(as.numeric(x_chr))
   serial_date <- as.Date(serial, origin = "1899-12-30")
@@ -243,9 +401,9 @@ extract_matching_sheets_from_workbook <- function(file_path, patterns) {
   dplyr::bind_rows(matched_sheets)
 }
 
-write_processed_dataset <- function(df, dataset_id) {
+write_interim_dataset <- function(df, dataset_id) {
   ensure_project_dirs()
-  out_path <- file.path("data", "processed", paste0(dataset_id, ".csv"))
+  out_path <- file.path("data", "interim", paste0(dataset_id, ".csv"))
   readr::write_csv(df, out_path)
   invisible(out_path)
 }
@@ -265,8 +423,15 @@ write_raw_dataset <- function(df, dataset_id) {
 }
 
 write_api_source_result <- function(result, dataset_id) {
+  # Partial or failed queries must not replace a historical source extract.
+  if (nrow(result$errors) > 0L || nrow(result$data) == 0L) {
+    details <- if ("error_message" %in% names(result$errors)) {
+      paste(unique(result$errors$error_message), collapse = "; ")
+    } else "No observations returned"
+    rlang::abort(paste("Incomplete API result for", dataset_id, details), class = "source_api_incomplete_error")
+  }
   write_raw_dataset(result$data, dataset_id)
-  write_processed_dataset(result$data, dataset_id)
+  write_final_dataset(result$data, dataset_id)
 
   error_id <- paste0(dataset_id, "_errors")
   error_path <- file.path("data", "raw", paste0(error_id, ".csv"))
@@ -279,7 +444,7 @@ write_api_source_result <- function(result, dataset_id) {
 
   invisible(list(
     raw = file.path("data", "raw", paste0(dataset_id, ".csv")),
-    processed = file.path("data", "processed", paste0(dataset_id, ".csv")),
+    final = file.path("data", "final", paste0(dataset_id, ".csv")),
     errors = error_path
   ))
 }
@@ -292,7 +457,7 @@ parse_year_env <- function(var_name, default) {
   value <- suppressWarnings(as.integer(Sys.getenv(var_name, as.character(default))))
 
   if (is.na(value)) {
-    return(default)
+    rlang::abort(paste(var_name, "must be an integer year"), class = "source_configuration_error")
   }
 
   value
@@ -305,6 +470,8 @@ fetch_imf_indicator_set <- function(
   start_year = parse_year_env("START_YEAR", 2000),
   end_year = parse_year_env("END_YEAR", as.integer(format(Sys.Date(), "%Y")) + 5)
 ) {
+  cached <- cached_api_source(dataset_id)
+  if (!is.null(cached)) return(cached)
   results <- purrr::pmap(indicator_map, function(...) {
     row <- tibble::as_tibble(list(...))
 
@@ -324,14 +491,24 @@ fetch_imf_indicator_set <- function(
 
     tryCatch(
       {
-        sdmx_raw <- rsdmx::readSDMX(
-          providerId = "IMF_DATA",
-          resource = "data",
-          flowRef = flow_id,
-          key = key,
-          start = start_year,
-          end = end_year
-        )
+        # Capture SDMX bytes through the installed provider's request builder.
+        imf_reader <- getOption("repro.imf")
+        captured <- file.path("data/raw/api", dataset_id,
+          paste0(digest::digest(c(flow_id, key), algo = "sha256"), ".xml"))
+        sdmx_raw <- if (is.function(imf_reader)) {
+          imf_reader(flow_id, key, start_year, end_year)
+        } else {
+          # Reuse the installed-provider request builder already used by response replay.
+          adapter <- new.env(parent = globalenv())
+          sys.source("R/reproducibility.R", envir = adapter)
+          adapter$repro_imf_request(flow_id, key, start_year, end_year,
+            function(url, dest_path, max_attempts, timeout_seconds) {
+              download_latest_file(url, captured, max_attempts, timeout_seconds)
+              if (!file.copy(captured, dest_path, overwrite = TRUE)) {
+                rlang::abort("Cannot stage captured IMF response", class = "source_archive_error")
+              }
+            })
+        }
 
         df <- as.data.frame(sdmx_raw)
 
@@ -350,7 +527,8 @@ fetch_imf_indicator_set <- function(
             requested_frequency = frequency,
             requested_key = key,
             date = period_to_date(.data$TIME_PERIOD),
-            downloaded_at = format(Sys.time(), "%Y-%m-%d %H:%M:%S"),
+            downloaded_at = if (is.function(imf_reader)) format(Sys.time(), "%Y-%m-%d %H:%M:%S") else
+              source_retrieval_time(captured, .env$dataset_id),
             dplyr::across(dplyr::any_of(c("SCALE", "OBS_VALUE")), as.numeric)
           )
 
@@ -390,6 +568,8 @@ fetch_wb_indicator_set <- function(
   max_attempts = 3,
   timeout_seconds = 180
 ) {
+  cached <- cached_api_source(dataset_id)
+  if (!is.null(cached)) return(cached)
   timeout_old <- getOption("timeout")
   on.exit(options(timeout = timeout_old), add = TRUE)
   options(timeout = timeout_seconds)
@@ -410,7 +590,16 @@ fetch_wb_indicator_set <- function(
 
         for (attempt in seq_len(max_attempts)) {
           raw_json <- tryCatch(
-            jsonlite::fromJSON(source_url, flatten = TRUE),
+            {
+              # The runner retains the exact JSON response before transformation.
+              json_reader <- getOption("repro.json")
+              if (is.function(json_reader)) json_reader(source_url) else {
+                captured <- file.path("data/raw/api", dataset_id,
+                  paste0(digest::digest(source_url, algo = "sha256", serialize = FALSE), ".json"))
+                download_latest_file(source_url, captured, max_attempts, timeout_seconds)
+                jsonlite::fromJSON(captured, flatten = TRUE)
+              }
+            },
             error = function(e) {
               last_error <<- e
               NULL
@@ -451,7 +640,8 @@ fetch_wb_indicator_set <- function(
             year = as.integer(.data$date),
             date = as.Date(sprintf("%s-01-01", year)),
             value = as.numeric(value),
-            downloaded_at = format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+            downloaded_at = if (is.function(getOption("repro.json"))) format(Sys.time(), "%Y-%m-%d %H:%M:%S") else
+              source_retrieval_time(captured, .env$dataset_id)
           ) %>%
           dplyr::filter(year >= start_year, year <= end_year)
 

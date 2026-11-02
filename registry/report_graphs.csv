@@ -1,0 +1,13 @@
+figure_id,script_path,image_path,data_path,input_files
+growth,scripts/real_91_gdp_quarterly_graphs.R,outputs/figures/real_gdp_growth_annual_quarterly.png,outputs/data/real_91_gdp_comparison_graph.csv,data/final/real_01_gdp_a_a_bcv.csv;data/final/real_03_gdp_q_a_bcv.csv;data/final/real_10_gdp_quarterly_bcv.csv
+inflation,scripts/prices_90_inflation_fx_graphs.R,outputs/figures/prices_inflation_headline_food_yoy.png,outputs/data/prices_90_inflation_yoy_graph.csv,data/final/prices_04_inflation_groups_bcv.csv
+inflation_fx_monthly,scripts/prices_90_inflation_fx_graphs.R,outputs/figures/prices_inflation_fx_monthly.png,outputs/data/prices_90_inflation_fx_monthly_graph.csv,data/final/prices_04_inflation_groups_bcv.csv;data/final/external_fx.csv
+fx,scripts/external_99_fx_report_graphs.R,outputs/figures/external_fx_daily.png,outputs/data/external_99_fx_graph.csv,data/final/external_fx.csv
+fx_gap,scripts/external_99_fx_report_graphs.R,outputs/figures/external_fx_gap_daily_ma30.png,outputs/data/external_99_fx_graph.csv,data/final/external_fx.csv
+oil_production,scripts/oil_90_graphs.R,outputs/figures/oil_production_sources.png,outputs/data/oil_90_production_graph.csv,data/final/oil_01_prod_opec_latest.csv
+oil_prices,scripts/oil_90_graphs.R,outputs/figures/oil_prices_benchmarks.png,outputs/data/oil_90_prices_graph.csv,data/final/oil_02_price_opec_latest.csv
+oil_exports_reuters,scripts/oil_91_exports_graph.R,outputs/figures/oil_15_exports_reuters_monthly.png,outputs/data/oil_91_exports_graph.csv,data/final/oil_15_exports_reuters_monthly.csv
+external,scripts/external_98_goods_graphs.R,outputs/figures/external_goods_trade.png,outputs/data/external_98_goods_graph.csv,output/reports/report_series.csv
+fiscal,scripts/fiscal_90_balance_graph.R,outputs/figures/fiscal_revenue_expenditure_balance.png,outputs/data/fiscal_90_balance_graph.csv,data/final/fiscal_05_components_imf.csv
+monetary_real,scripts/monetary_92_aggregates_graphs.R,outputs/figures/monetary_base_liquidity_real.png,outputs/data/monetary_92_aggregates.csv,data/final/monetary_01_mb_bcv.csv;data/final/monetary_02_liq_bcv.csv;data/final/prices_05_daily_cpi_bcv.csv
+monetary_growth,scripts/monetary_92_aggregates_graphs.R,outputs/figures/monetary_base_liquidity_growth_yoy.png,outputs/data/monetary_92_aggregates.csv,data/final/monetary_01_mb_bcv.csv;data/final/monetary_02_liq_bcv.csv;data/final/prices_05_daily_cpi_bcv.csv

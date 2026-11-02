@@ -1,0 +1,5 @@
+currency_code,effective_start,effective_end,zeros_removed_at_start,cumulative_zeros_to_current,current_ves_per_currency_unit,notes
+VEB,1879-01-01,2007-12-31,0,14,1e-14,Bolivar before the 2008 redenomination
+VEF,2008-01-01,2018-08-19,3,11,1e-11,Bolivar fuerte introduced on 1 January 2008
+VES_2018,2018-08-20,2021-09-30,5,6,1e-6,Bolivar soberano introduced on 20 August 2018
+VES_current,2021-10-01,,6,0,1,Current monetary expression introduced on 1 October 2021; also referenced as VED

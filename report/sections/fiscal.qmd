@@ -1,0 +1,12 @@
+## Balance Fiscal y Recaudación Tributaria
+
+**[Análisis: uno o dos párrafos.]** Analizar el balance fiscal y la disponibilidad de ingresos públicos, diferenciando estimaciones de cifras oficiales. Integrar la recaudación del SENIAT y sus equivalentes en dólares una vez verificadas la fuente, la frecuencia y las tasas de conversión.
+
+```{r}
+#| label: fiscal-figure
+
+# Display the reconciled revenue, expenditure, and balance export from the fiscal graph script.
+knitr::include_graphics(report_graphs[["fiscal"]], rel_path = FALSE)
+```
+
+**[Segundo gráfico pendiente: recaudación tributaria.]** Completar la serie del SENIAT y la comparación al tipo de cambio oficial y alternativo antes de incorporar el panel.

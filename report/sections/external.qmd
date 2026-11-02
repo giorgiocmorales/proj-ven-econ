@@ -1,0 +1,14 @@
+## Sector Externo y Disponibilidad de Divisas
+
+**[Análisis: uno o dos párrafos.]** Explicar las exportaciones e importaciones de bienes y sus implicaciones para la disponibilidad de divisas. Incorporar las intervenciones cambiarias cuando se cuente con una serie verificable de montos; las fechas y tasas publicadas no equivalen a montos de intervención.
+
+```{r}
+#| label: external-figure
+
+# Display the goods-trade asset exported by the external-sector graph script.
+knitr::include_graphics(report_graphs[["external"]], rel_path = FALSE)
+```
+
+**[Segundo gráfico pendiente: intervenciones cambiarias mensuales.]** Completar la fuente y el contrato de datos de los montos antes de incluir este panel. El gráfico actual de comercio de bienes no distingue las exportaciones petroleras.
+
+{{< pagebreak >}}

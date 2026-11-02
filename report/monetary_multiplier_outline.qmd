@@ -1,0 +1,106 @@
+---
+title: "Multiplicador monetario en Venezuela"
+subtitle: "Estructura de trabajo para la respuesta escrita"
+lang: es
+format:
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+# Load only the package required to insert the pre-generated ggplot assets.
+library(knitr)
+```
+
+## Resumen ejecutivo
+
+> **Por desarrollar:** tesis central en dos o tres frases. Separar la explicación contable de los mecanismos económicos y de la interpretación coyuntural venezolana.
+
+## 1. Definición y método
+
+- Definición de trabajo: multiplicador observado = liquidez monetaria / base monetaria.
+- Descomposición exacta: cambio logarítmico del multiplicador = cambio logarítmico de la liquidez − cambio logarítmico de la base.
+- Advertencia: esta identidad ubica el movimiento en numerador o denominador, pero no identifica por sí sola la causa económica.
+- Nota de datos: series BCV homologadas a la escala monetaria vigente; cifras originales preservadas en raw/interim.
+- Contraste de plausibilidad: el multiplicador se comparó contra el archivo de trabajo de Mercantil sin incorporarlo a la fuente oficial ni sobrescribir observaciones BCV.
+
+## 2. Evolución del multiplicador
+
+```{r}
+#| label: multiplier-figure
+#| fig-cap: "Multiplicador monetario observado."
+# Insert the ggplot export used to identify levels, cycles and possible breakpoints.
+knitr::include_graphics("../outputs/figures/monetary_multiplier_1.jpeg")
+```
+
+> **Preguntas para discutir:** ¿cuáles son los principales quiebres? ¿Qué periodización resulta visible antes de añadir contexto institucional?
+
+## 3. ¿Liquidez o base monetaria?
+
+```{r}
+#| label: decomposition-figure
+#| fig-cap: "Descomposición contable del cambio anual del multiplicador."
+# Insert the exploratory exact-log decomposition of annual movements.
+knitr::include_graphics("../outputs/figures/monetary_multiplier_4_decomposition.jpeg")
+```
+
+> **Interpretación pendiente:** identificar en cada etapa si dominó la expansión/contracción relativa de la liquidez o de la base monetaria. No confundir contribución contable con causalidad.
+
+## 4. Canal bancario: encaje, reservas e intermediación
+
+```{r}
+#| label: reserve-rates-figure
+#| fig-cap: "Coeficientes de encaje legal de la banca comercial y universal."
+# Insert the separate ordinary, marginal and special statutory reserve rates.
+knitr::include_graphics("../outputs/figures/monetary_multiplier_2_encaje.jpeg")
+```
+
+Puntos para desarrollar:
+
+- El signo esperado de un mayor encaje sobre la capacidad de expansión de depósitos.
+- La diferencia entre coeficientes regulatorios y reservas efectivamente mantenidas.
+- Posibles rezagos, cambios de base de cálculo y mecanismos de evasión o adaptación.
+
+## 5. Depósitos, inflación y composición de la liquidez
+
+```{r}
+#| label: deposits-figure
+#| fig-cap: "Depósitos nominales y reales en la escala monetaria actual."
+# Insert nominal deposits and their CPI-adjusted counterpart.
+knitr::include_graphics("../outputs/figures/monetary_multiplier_3_deposits.jpeg")
+```
+
+```{r}
+#| label: composition-figure
+#| fig-cap: "Composición de la liquidez monetaria."
+# Insert the exploratory liquidity composition chart.
+knitr::include_graphics("../outputs/figures/monetary_multiplier_5_composition.jpeg")
+```
+
+> **Puntos para discutir:** profundidad real de los depósitos, demanda de efectivo, cuasidinero, dolarización transaccional y límites de medir la intermediación únicamente con agregados en bolívares.
+
+## 6. Periodización e interpretación venezolana
+
+Completar una matriz breve por etapa:
+
+| Etapa | Movimiento del multiplicador | Palanca contable dominante | Mecanismo propuesto | Evidencia adicional necesaria |
+|---|---:|---|---|---|
+| Por definir | Por definir | Liquidez/base | Por verificar | Regulación, crédito, dolarización, coyuntura fiscal y cambiaria |
+
+## 7. Síntesis de palancas y cautelas
+
+- Palanca 1: por definir.
+- Palanca 2: por definir.
+- Palanca 3: por definir.
+- Explicaciones alternativas: por definir.
+- Limitaciones de datos y alcance causal: por definir.
+
+## Fuentes y notas
+
+- Banco Central de Venezuela: liquidez monetaria, base monetaria, IPC, encaje legal y balances de instituciones financieras.
+- Cálculos propios a partir de las series homologadas del repositorio.

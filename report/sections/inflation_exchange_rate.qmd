@@ -1,0 +1,39 @@
+## Inflación y Tipo de Cambio
+
+**[Análisis: uno o dos párrafos.]** Relacionar la evolución del tipo de cambio oficial y alternativo con la inflación, la brecha cambiaria y las presiones sobre costos y precios. Separar los cambios mensuales de las variaciones interanuales y precisar el último período disponible para cada indicador.
+
+```{r}
+#| label: fx-figure
+
+# Display the daily FX export from the standardized exchange-rate graph script.
+knitr::include_graphics(report_graphs[["fx"]], rel_path = FALSE)
+```
+
+```{r}
+#| label: inflation-figure
+
+# Display the headline and food inflation export from the price graph script.
+knitr::include_graphics(report_graphs[["inflation"]], rel_path = FALSE)
+```
+
+{{< pagebreak >}}
+
+### Variaciones mensuales y brecha cambiaria
+
+**[Análisis: uno o dos párrafos.]** Comparar los cambios mensuales de precios y tipos de cambio en el último mes completo común a las cuatro series. Interpretar la brecha diaria junto con su promedio móvil de 30 días, sin extrapolar fuentes que dejaron de publicar observaciones.
+
+```{r}
+#| label: inflation-fx-monthly-figure
+
+# Reuse the aligned monthly comparison exported by the price graph script.
+knitr::include_graphics(report_graphs[["inflation_fx_monthly"]], rel_path = FALSE)
+```
+
+```{r}
+#| label: fx-gap-figure
+
+# Reuse the validated daily gap and rolling-average export from the FX graph script.
+knitr::include_graphics(report_graphs[["fx_gap"]], rel_path = FALSE)
+```
+
+{{< pagebreak >}}

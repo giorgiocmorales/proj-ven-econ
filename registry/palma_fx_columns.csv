@@ -1,0 +1,38 @@
+workbook_id,sheet,date_column,value_column,value_letter,first_row,last_row,variable_id,market,quote_currency,source_currency_rule,frequency,priority,carry_days
+palma_master,Diario,1,4,D,7,8304,parallel,parallel,USD,contemporaneous,daily,20,7
+palma_master,Diario,1,5,E,7,8304,official_headline,official,USD,contemporaneous,daily,20,7
+palma_master,Diario,1,6,F,7,8304,official_cadivi_i,official,USD,contemporaneous,daily,20,7
+palma_regimes,TC diario,1,2,B,6,5768,parallel,parallel,USD,contemporaneous,daily,10,7
+palma_regimes,TC diario,1,3,C,6,5768,official_cadivi_i,official,USD,contemporaneous,daily,10,7
+palma_regimes,TC diario,1,4,D,6,5768,official_cadivi_ii,official,USD,contemporaneous,daily,10,7
+palma_regimes,TC diario,1,5,E,6,5768,official_cencoex_dipro,official,USD,contemporaneous,daily,10,7
+palma_regimes,TC diario,1,6,F,6,5768,official_sicad_i,official,USD,contemporaneous,daily,10,7
+palma_regimes,TC diario,1,7,G,6,5768,official_sicad_ii,official,USD,contemporaneous,daily,10,7
+palma_regimes,TC diario,1,8,H,6,5768,official_simadi_dicom,official,USD,contemporaneous,daily,10,7
+palma_regimes,TC diario,1,9,I,6,5768,official_mesas,official,USD,contemporaneous,daily,10,7
+palma_notes,Sheet1,2,3,C,51,3749,parallel_venezuela_fx,parallel,USD,vef_until_2018,daily,30,7
+palma_notes,Sheet1,2,4,D,51,3749,official_sicad_i,official,USD,vef_until_2018,auction,30,0
+palma_notes,Sheet1,2,5,E,51,3749,official_sicad_ii,official,USD,vef_until_2018,daily,30,7
+palma_notes,Sheet1,2,6,F,51,3749,official_simadi,official,USD,vef_until_2018,daily,30,7
+palma_notes,Sheet1,2,7,G,51,3749,official_dicom,official,USD,vef_until_2018,daily,30,7
+palma_notes,Sheet1,2,8,H,51,3749,official_dicom_eur,official,EUR,vef_until_2018,daily,30,7
+palma_notes,Sheet1,2,10,J,51,3749,parallel_dolartoday_cucuta,parallel,USD,vef_until_2018,daily,30,7
+palma_notes,Sheet1,2,11,K,51,3749,parallel_dolartoday_caracas,parallel,USD,vef_until_2018,daily,30,7
+palma_notes,Sheet1,2,12,L,51,3749,parallel_dolartoday_bitcoin,parallel,USD,vef_until_2018,daily,30,7
+palma_charts,Gráfico 7.1,1,2,B,2,197,official_headline,official,USD,VEB,daily,40,7
+palma_charts,Gráfico 12.3,1,6,F,2,45,official_sitme,official,USD,VEF,monthly,40,0
+palma_charts,Gráfico 13.2,1,4,D,2,16,official_sicad_i,official,USD,VEF,auction,40,0
+palma_charts,Gráfico 13.4,1,5,E,2,30,official_sicad_i,official,USD,VEF,auction,40,0
+palma_charts,Gráfico 14.1,1,2,B,2,251,official_simadi,official,USD,VEF,daily,40,7
+palma_charts,Gráfico 14.1,1,3,C,2,251,parallel,parallel,USD,VEF,daily,40,7
+palma_charts,Gráfico 15.1,1,2,B,2,248,official_simadi_dicom,official,USD,VEF,daily,40,7
+palma_charts,Gráfico 15.1,1,3,C,2,248,parallel,parallel,USD,VEF,daily,40,7
+palma_charts,Gráfico 15.3,1,2,B,2,188,parallel,parallel,USD,VES_2018,daily,40,7
+palma_charts,Gráfico 15.3,1,3,C,2,188,official_dicom,official,USD,VES_2018,daily,40,7
+palma_charts,Gráfico 16.1,1,2,B,2,133,parallel,parallel,USD,VES_2018,daily,40,7
+palma_charts,Gráfico 16.1,1,3,C,2,133,official_dicom,official,USD,VES_2018,daily,40,7
+palma_charts,Gráfico 17.1,1,2,B,2,78,parallel,parallel,USD,VES_2018,daily,40,7
+palma_charts,Gráfico 17.1,1,3,C,2,78,official_headline,official,USD,VES_2018,daily,40,7
+palma_charts,Gráfico 17.2,1,2,B,2,182,parallel,parallel,USD,VES_2018,daily,40,7
+palma_charts,Gráfico 17.2,1,3,C,2,182,parallel_corporate,parallel,USD,VES_2018,daily,40,7
+palma_charts,Gráfico 17.2,1,4,D,2,182,official_headline,official,USD,VES_2018,daily,40,7
