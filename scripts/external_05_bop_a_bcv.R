@@ -13,8 +13,8 @@ source_id <- "bcv"
 source_url <- "https://bcv.org.ve/sites/default/files/indicadores_sector_externo/2_4_1_a.xls"
 raw_path <- file.path("data", "raw", "bcv_bop_a.xls")
 
-downloaded_at <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
 download_latest_file(source_url, raw_path)
+downloaded_at <- source_retrieval_time(raw_path, dataset_id)
 
 bop_sheet <- read_bcv_sheet(raw_path, sheet = "Anual", col_names = FALSE) %>%
   as_tibble(.name_repair = "unique")
@@ -59,4 +59,4 @@ bop_a_raw <- bop_sheet %>%
     year = as.integer(year)
   )
 
-write_processed_dataset(bop_a_raw, dataset_id)
+write_final_dataset(bop_a_raw, dataset_id)

@@ -9,19 +9,15 @@ source("R/source_helpers.R")
 ensure_project_dirs()
 
 base_url <- "https://www.bcv.org.ve/estadisticas/indice-de-inversion"
-processed_path <- "data/processed/external_02_fx_ind_bcv.csv"
+processed_path <- "data/final/external_02_fx_ind_bcv.csv"
 
 # Download a BCV page locally before parsing because direct rvest requests can fail.
 download_bcv_index_page <- function(url) {
-  downloaded_path <- tempfile(fileext = ".html")
+  downloaded_path <- file.path("data/raw/bcv_index_fx/pages",
+    paste0(digest::digest(url, algo = "sha256", serialize = FALSE), ".html"))
 
-  download.file(
-    url = url,
-    destfile = downloaded_path,
-    mode = "wb",
-    quiet = TRUE,
-    method = "libcurl"
-  )
+  # Use the shared transport so each paginated response can be captured/replayed.
+  download_latest_file(url, downloaded_path, max_attempts = 3, timeout_seconds = 120)
 
   downloaded_path
 }
@@ -45,7 +41,6 @@ extract_bcv_index_page_numbers <- function(page) {
 scrape_bcv_fx_page <- function(page_number) {
   page_url <- glue("{base_url}?page={page_number}")
   downloaded_path <- download_bcv_index_page(url = page_url)
-  on.exit(unlink(downloaded_path), add = TRUE)
 
   table_node <- rvest::read_html(downloaded_path) %>%
     rvest::html_element("table")
@@ -78,10 +73,23 @@ scrape_bcv_fx_page <- function(page_number) {
   clean_table
 }
 
+# A preserved historical extraction is explicitly distinguished from archived HTML.
+legacy_path <- "data/raw/bcv_index_fx/legacy_extract.csv"
+if (!file.exists(legacy_path) && source_acquisition_mode() != "update" && file.exists(processed_path)) {
+  legacy_path <- processed_path
+}
+if (source_acquisition_mode() != "update" && file.exists(legacy_path)) {
+  bcv_scraped_data <- readr::read_csv(legacy_path, show_col_types = FALSE)
+  if (!all(c("fecha", "tasa") %in% names(bcv_scraped_data)) ||
+      !nrow(bcv_scraped_data) || anyNA(bcv_scraped_data$fecha) ||
+      anyDuplicated(bcv_scraped_data$fecha) || any(!is.finite(bcv_scraped_data$tasa) | bcv_scraped_data$tasa <= 0)) {
+    rlang::abort("Invalid legacy index extraction", class = "bcv_index_cache_error")
+  }
+  message("Using preserved BCV index extraction; original historical HTML was not retained")
+} else {
 landing_path <- download_bcv_index_page(url = base_url)
 landing_page <- rvest::read_html(landing_path)
 # Release the temporary file after parsing; on.exit() is only valid in a function.
-unlink(landing_path)
 page_numbers <- extract_bcv_index_page_numbers(page = landing_page)
 
 bcv_scraped_data <- purrr::map_dfr(page_numbers, function(page_number) {
@@ -95,4 +103,5 @@ if (nrow(bcv_scraped_data) == 0) {
   stop("BCV investment-index extractor produced no observations", call. = FALSE)
 }
 
+}
 readr::write_csv(bcv_scraped_data, processed_path)

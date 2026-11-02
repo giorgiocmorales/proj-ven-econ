@@ -2,13 +2,13 @@
 library(tidyverse)
 source("R/data_contract_helpers.R")
 
-corpus <- read_csv("data/processed/oil_13_momr_corpus.csv", show_col_types = FALSE,
+corpus <- read_csv("data/final/oil_13_momr_corpus.csv", show_col_types = FALSE,
                    col_types = cols(footnote_marker = col_character()))
 latest <- read_csv("data/final/oil_13_momr_latest.csv", show_col_types = FALSE,
                    col_types = cols(footnote_marker = col_character()))
 readr::stop_for_problems(corpus)
 readr::stop_for_problems(latest)
-audit <- read_csv("data/final/oil_13_momr_report_audit.csv", show_col_types = FALSE)
+audit <- read_csv("data/interim/oil_13_momr_report_audit.csv", show_col_types = FALSE)
 stopifnot(!anyDuplicated(corpus[c("report_month", "source_type", "series_id", "date")]),
           !anyDuplicated(latest[c("source_type", "series_id", "date")]),
           all(corpus$date < corpus$report_month),

@@ -7,7 +7,7 @@ config <- read_report_config(path = Sys.getenv("REPORT_CONFIG", "config/report.y
 first_year <- year(as.Date(if (is.null(config$params$fiscal_history_start))
   config$params$history_start else config$params$fiscal_history_start))
 last_year <- year(as.Date(config$params$data_cutoff)) - 1L
-fiscal_source <- readr::read_csv("data/processed/fiscal_05_components_imf.csv", show_col_types = FALSE) %>%
+fiscal_source <- readr::read_csv("data/final/fiscal_05_components_imf.csv", show_col_types = FALSE) %>%
   filter(COUNTRY == "VEN", FREQUENCY == "A", INDICATOR %in% c("GGR_NGDP", "GGX_NGDP", "GGXCNL_NGDP")) %>%
   mutate(year = as.integer(TIME_PERIOD))
 if (anyDuplicated(fiscal_source[c("year", "INDICATOR")]) ||
@@ -22,10 +22,10 @@ if (any(!complete.cases(fiscal_data)) || any(fiscal_data$revenue < 0 | fiscal_da
   stop("Revenue minus expenditure must reconcile with IMF net lending/borrowing within 0.01 pp")
 }
 fiscal_data <- fiscal_data %>% mutate(source_id = "imf", unit = "percent_gdp",
-  source_file = "data/processed/fiscal_05_components_imf.csv",
+  source_file = "data/final/fiscal_05_components_imf.csv",
   source_update_date = first(fiscal_source$COUNTRY_UPDATE_DATE),
   downloaded_at = first(fiscal_source$downloaded_at))
-readr::write_csv(fiscal_data, "data/final/fiscal_05_components_imf.csv")
+# The graph must never replace the canonical long source dataset with a wide table.
 plotted <- fiscal_data %>% filter(between(year, first_year, last_year))
 if (!nrow(plotted) || !identical(plotted$year, seq.int(min(plotted$year), max(plotted$year)))) {
   stop("Fiscal chart needs consecutive annual observations")
@@ -52,7 +52,7 @@ fiscal_figure <- bars %>%
     caption = paste0("Notas: incluye estimaciones. Gastos con signo negativo. Balance fiscal = ingresos − gastos.\n",
       "Fuentes: FMI, World Economic Outlook.")) +
   report_chart_theme + guides(fill = guide_legend(order = 1, nrow = 1), color = guide_legend(order = 2, nrow = 1))
-readr::write_csv(plotted, "data/final/fiscal_90_balance_graph.csv")
+readr::write_csv(plotted, "outputs/data/fiscal_90_balance_graph.csv")
 ggsave("outputs/figures/fiscal_revenue_expenditure_balance.png", fiscal_figure,
   width = 10, height = 5.625, units = "in", dpi = 300, device = ragg::agg_png, bg = "white")
 ggsave("outputs/figures/fiscal_revenue_expenditure_balance.pdf", fiscal_figure,

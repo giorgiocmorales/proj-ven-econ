@@ -1,0 +1,8 @@
+suite,exit_code,passed,log_directory
+reproducibility,0,TRUE,D:/Documents/6_Data Science/Portfolio/proj-ven-econ/data/reproducibility/checks\checks-286dc493ae90
+bcv_statements,0,TRUE,D:/Documents/6_Data Science/Portfolio/proj-ven-econ/data/reproducibility/checks\checks-286dc493ae90
+fx_intervention_conversion,0,TRUE,D:/Documents/6_Data Science/Portfolio/proj-ven-econ/data/reproducibility/checks\checks-286dc493ae90
+report_pipeline,0,TRUE,D:/Documents/6_Data Science/Portfolio/proj-ven-econ/data/reproducibility/checks\checks-286dc493ae90
+opec_downloads,0,TRUE,D:/Documents/6_Data Science/Portfolio/proj-ven-econ/data/reproducibility/checks\checks-286dc493ae90
+historical_inflation,0,TRUE,D:/Documents/6_Data Science/Portfolio/proj-ven-econ/data/reproducibility/checks\checks-286dc493ae90
+reuters_exports,0,TRUE,D:/Documents/6_Data Science/Portfolio/proj-ven-econ/data/reproducibility/checks\checks-286dc493ae90

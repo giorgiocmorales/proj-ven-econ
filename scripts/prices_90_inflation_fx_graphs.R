@@ -26,7 +26,7 @@ fx_monthly <- fx %>% pivot_longer(-date, names_to = "series_id", values_to = "ra
   filter(date <= last_complete_month) %>% group_by(series_id) %>%
   complete(date = seq(min(date), max(date), by = "month")) %>% arrange(date, .by_group = TRUE) %>%
   mutate(value = 100 * (monthly_rate / lag(monthly_rate) - 1)) %>% ungroup()
-readr::write_csv(fx_monthly, "data/final/prices_90_fx_monthly_changes.csv")
+readr::write_csv(fx_monthly, "outputs/data/prices_90_fx_monthly_changes.csv")
 
 yoy_data <- inflation %>% filter(variable_id == "inflation_yoy", date >= start_date) %>%
   mutate(series = factor(series_id, levels = c("headline", "food"),
@@ -79,9 +79,9 @@ monthly_figure <- monthly_data %>%
     caption = "Notas: alimentos incluye bebidas no alcohólicas. TC: variación del promedio mensual de tasas diarias consolidadas.\nSolo meses completos; IPC provisional.\nFuentes: BCV y Yadio; cálculos propios.") +
   report_chart_theme + guides(fill = guide_legend(nrow = 1, byrow = TRUE))
 
-readr::write_csv(yoy_data, "data/final/prices_90_inflation_yoy_graph.csv")
-readr::write_csv(monthly_data, "data/final/prices_90_inflation_fx_monthly_graph.csv")
-readr::write_csv(coverage, "data/final/prices_90_graph_coverage.csv")
+readr::write_csv(yoy_data, "outputs/data/prices_90_inflation_yoy_graph.csv")
+readr::write_csv(monthly_data, "outputs/data/prices_90_inflation_fx_monthly_graph.csv")
+readr::write_csv(coverage, "outputs/data/prices_90_graph_coverage.csv")
 figures <- list(prices_inflation_headline_food_yoy = yoy_figure,
                 prices_inflation_fx_monthly = monthly_figure)
 for (name in names(figures)) {

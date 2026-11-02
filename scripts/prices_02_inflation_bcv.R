@@ -8,7 +8,7 @@ source("R/source_helpers.R")
 ensure_project_dirs()
 
 cpi_source <- readr::read_csv(
-  "data/processed/prices_01_cpi_bcv.csv",
+  "data/final/prices_01_cpi_bcv.csv",
   show_col_types = FALSE
 ) %>%
   arrange(.data$date)

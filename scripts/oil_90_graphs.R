@@ -114,9 +114,9 @@ prices_figure <- prices %>%
 
 # Export the observations, coverage audit, and matching PNG/PDF assets for both graphs.
 dir.create("outputs/figures", recursive = TRUE, showWarnings = FALSE)
-readr::write_csv(production, "data/final/oil_90_production_graph.csv")
-readr::write_csv(prices, "data/final/oil_90_prices_graph.csv")
-readr::write_csv(coverage, "data/final/oil_90_graph_coverage.csv")
+readr::write_csv(production, "outputs/data/oil_90_production_graph.csv")
+readr::write_csv(prices, "outputs/data/oil_90_prices_graph.csv")
+readr::write_csv(coverage, "outputs/data/oil_90_graph_coverage.csv")
 oil_figures <- list(oil_production_sources = production_figure, oil_prices_benchmarks = prices_figure)
 for (figure_name in names(oil_figures)) {
   ggsave(paste0("outputs/figures/", figure_name, ".png"), plot = oil_figures[[figure_name]],

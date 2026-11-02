@@ -127,6 +127,9 @@ financial_variable_id <- function(dataset_family, label_raw) {
     dataset_family == "reserve_coefficients" & stringr::str_detect(key, "ordinario|ordinary") ~ "reserve_ratio_ordinary",
     dataset_family == "reserve_coefficients" & stringr::str_detect(key, "marginal") ~ "reserve_ratio_marginal",
     dataset_family == "reserve_coefficients" & stringr::str_detect(key, "especial|special") ~ "reserve_ratio_special",
+    dataset_family == "reserve_coefficients" & key == "sight" ~ "reserve_ratio_sight",
+    dataset_family == "reserve_coefficients" & key == "savings" ~ "reserve_ratio_savings",
+    dataset_family == "reserve_coefficients" & key == "term" ~ "reserve_ratio_term",
     TRUE ~ fallback
   )
 }
@@ -150,7 +153,8 @@ financial_attach_metadata <- function(observations, source_row, dataset_id) {
       source_file = source_row$raw_file[[1]],
       source_vintage = source_row$vintage_label[[1]],
       source_priority = source_row$priority[[1]],
-      downloaded_at = format(file.info(source_row$raw_file[[1]])$mtime, "%Y-%m-%d %H:%M:%S")
+      downloaded_at = source_retrieval_time(source_row$raw_file[[1]], .env$dataset_id),
+      source_file_modified_at = format(file.info(source_row$raw_file[[1]])$mtime, "%Y-%m-%d %H:%M:%S")
     ) %>%
     dplyr::left_join(unit_map, by = c("unit_profile", "currency_group"))
 

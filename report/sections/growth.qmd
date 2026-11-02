@@ -1,11 +1,11 @@
 ## Crecimiento y Producto Interno Bruto
 
-**[Análisis: uno o dos párrafos.]** Explicar el comportamiento anual y trimestral del PIB publicado por el BCV, los principales motores y restricciones de la actividad y sus implicaciones para el cliente. Las tasas trimestrales son interanuales; no confundirlas con tasas respecto al trimestre anterior. Añadir los supuestos de recuperación cuando esté disponible el módulo de escenarios.
+**[Análisis: uno o dos párrafos.]** Explicar el comportamiento anual y trimestral del PIB publicado por el BCV, los principales motores y restricciones de la actividad y sus implicaciones para el cliente. Las barras muestran la variación respecto al trimestre anterior, sin desestacionalizar; la línea compara los últimos cuatro trimestres con los cuatro anteriores y coincide con la tasa anual en T4. Añadir los supuestos de recuperación cuando esté disponible el módulo de escenarios.
 
 ```{r}
 #| label: growth-figure
 
-# Reuse the annual/quarterly comparison produced by the standardized GDP graph script.
+# Combine unadjusted QoQ bars and reconciled rolling-four-quarter growth on one scale.
 knitr::include_graphics(report_graphs[["growth"]], rel_path = FALSE)
 ```
 

@@ -12,12 +12,27 @@ library(lubridate)
 rm(list = ls())
 
 source("R/source_helpers.R")
+source("R/opec_download_helpers.R")
 ensure_project_dirs()
 
 registry_path <- file.path("registry", "opec_momr_reports.csv")
 start_month <- as.Date("2001-01-01")
 # Include completed report months by default; the current month's issue may not be published yet.
 end_month <- as.Date(Sys.getenv("OPEC_END_DATE", as.character(floor_date(Sys.Date(), "month") %m-% months(1))))
+
+# Include a published current-month issue even before it appears in the archive.
+# Explicit OPEC_END_DATE bounds still take precedence over rolling discovery.
+latest <- tryCatch(discover_opec_latest_report(timeout_seconds = 20), error = identity)
+if (inherits(latest, "error")) {
+  warning(paste("OPEC latest-report discovery failed:", conditionMessage(latest)), call. = FALSE)
+  write_csv(tibble(status = "error", details = conditionMessage(latest)), "data/raw/opec_latest_discovery.csv")
+} else {
+  if (latest$report_month[[1]] > floor_date(Sys.Date(), "month")) {
+    rlang::abort("OPEC latest issue is future-dated", class = "opec_publication_month_error")
+  }
+  write_csv(latest %>% mutate(status = "ok"), "data/raw/opec_latest_discovery.csv")
+  if (!nzchar(Sys.getenv("OPEC_END_DATE"))) end_month <- max(end_month, latest$report_month[[1]])
+}
 
 existing <- read_csv(
   registry_path,
@@ -85,8 +100,10 @@ for (archive_year in unique(year(discovery_months$report_month))) {
     archive_url = archive_url, status = "ok", details = paste(length(pdf_links), "PDF links"))
   for (i in which(year(updated_registry$report_month) == archive_year &
                   updated_registry$report_month %in% discovery_months$report_month)) {
-    month_name <- tolower(month.name[month(updated_registry$report_month[[i]])])
-    matches <- pdf_links[str_detect(tolower(pdf_links), paste0(month_name, "[-_]", archive_year))]
+    month_id <- month(updated_registry$report_month[[i]])
+    month_names <- unique(tolower(c(month.name[month_id], month.abb[month_id],
+                                   if (month_id == 9L) "sept" else character())))
+    matches <- pdf_links[str_detect(tolower(pdf_links), paste0("(?:", paste(month_names, collapse = "|"), ")[-_]", archive_year))]
     if (length(matches) == 1L) {
       updated_registry$pdf_url[[i]] <- matches[[1]]
       updated_registry$pdf_source[[i]] <- "official_archive"

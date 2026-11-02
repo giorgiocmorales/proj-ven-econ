@@ -30,47 +30,12 @@ extract_date_from_text <- function(x) {
 }
 
 # Download to data/raw/
-download_bcv_file <- function(url, max_attempts = 1, force = FALSE) {
-  file_name <- basename(url)
-  dest_path <- file.path("data/raw", file_name)
-
-  if (!force && file.exists(dest_path) && file.info(dest_path)$size > 0) {
-    return(dest_path)
-  }
-
-  download_path <- if (force) paste0(dest_path, ".download") else dest_path
-
-  timeout_old <- getOption("timeout")
-  on.exit(options(timeout = timeout_old), add = TRUE)
-  # BCV can leave unavailable historical URLs open for minutes. Keep a failed
-  # quarter bounded; successful raw files are cached and reused on the next
-  # full-build attempt.
-  options(timeout = 30)
-
-  for (attempt in seq_len(max_attempts)) {
-    ok <- tryCatch(
-      {
-        download.file(url, destfile = download_path, mode = "wb", quiet = TRUE, method = "libcurl")
-        TRUE
-      },
-      error = function(e) FALSE
-    )
-
-    if (ok && file.exists(download_path) && file.info(download_path)$size > 0) {
-      if (force) {
-        file.copy(download_path, dest_path, overwrite = TRUE)
-        unlink(download_path)
-      }
-      return(dest_path)
-    }
-
-    unlink(download_path)
-    if (attempt < max_attempts) {
-      Sys.sleep(1.5 * attempt)
-    }
-  }
-
-  stop(glue("Download failed after {max_attempts} attempts: {basename(url)}"))
+download_bcv_file <- function(url, max_attempts, force) {
+  dest_path <- file.path("data/raw", basename(url))
+  # Historical workbooks are reused; only the requested current-quarter refresh is forced.
+  if ((!force || source_acquisition_mode() != "update") &&
+      file.exists(dest_path) && file.info(dest_path)$size > 0) return(dest_path)
+  download_latest_file(url, dest_path, max_attempts = max_attempts, timeout_seconds = 30L)
 }
 
 # Extract currency rows from a single sheet
@@ -127,10 +92,11 @@ extract_fx_from_file <- function(file_path) {
 process_bcv_file <- function(url, database_id, force_download = FALSE) {
   file_path <- tryCatch(
     {
-      download_bcv_file(url, force = force_download)
+      download_bcv_file(url, max_attempts = 1L, force = force_download)
     },
     error = function(e) {
-      message(glue("Download failed: {basename(url)} - skipping"))
+      if (force_download) rlang::abort("Current SMC acquisition failed", parent = e, class = "source_refresh_error")
+      message(glue("Download failed: {basename(url)}: {conditionMessage(e)}"))
       return(NULL)
     }
   )
@@ -140,7 +106,8 @@ process_bcv_file <- function(url, database_id, force_download = FALSE) {
   result <- tryCatch(
     extract_fx_from_file(file_path),
     error = function(e) {
-      message(glue("XLS parse failed: {basename(file_path)} - check manually"))
+      if (force_download) rlang::abort("Current SMC workbook parsing failed", parent = e, class = "source_refresh_error")
+      message(glue("XLS parse failed: {basename(file_path)}: {conditionMessage(e)}"))
       file.copy(file_path, file.path("data/manual_fix", basename(file_path)), overwrite = TRUE)
       return(NULL)
     }
@@ -207,7 +174,7 @@ manual_fix_ids <- character()
 
 # Build history only when no processed dataset exists. Normal runs skip this
 # block and refresh the current/incomplete quarter below.
-processed_path <- "data/processed/external_01_fx_smc_bcv.csv"
+processed_path <- "data/final/external_01_fx_smc_bcv.csv"
 staging_path <- sub("[.]csv$", ".building.csv", processed_path)
 existing_smc <- if (file.exists(processed_path)) {
   read_csv(processed_path, show_col_types = FALSE)
@@ -308,7 +275,7 @@ database_id <- current_file$database_id[[1]]
 # force a fresh current-quarter download without touching the cached workbook
 # unless the replacement succeeds.
 if (!full_rebuild) {
-  fx_data <- process_bcv_file(url, database_id, force_download = TRUE)
+  fx_data <- process_bcv_file(url, database_id, force_download = source_acquisition_mode() == "update")
 
   if (!is.null(fx_data) && nrow(fx_data) > 0) {
     ves_fx_bcv <- ves_fx_bcv %>%
@@ -316,7 +283,8 @@ if (!full_rebuild) {
       bind_rows(fx_data) %>%
       arrange(fecha_valor, currency)
   } else {
-    message(glue("Refresh skipped for {database_id}: keeping previous data"))
+    rlang::abort(glue("SMC refresh failed for {database_id}; existing publication was preserved"),
+      class = "source_refresh_error")
   }
 } else {
   message(glue("Full build completed through {database_id}"))
@@ -341,6 +309,5 @@ rm(
   staging_path, existing_smc, completed_ids, missing_database_ids,
   duplicate_keys, converter_path, manual_fix_ids,
   download_bcv_file, extract_fx_from_file, extract_fx_from_sheet,
-  process_bcv_file, process_fixed_file, normalize_text, extract_date_from_text,
-  smc_manual_fix_registry, convert_smc_manual_workbook, prepare_smc_manual_workbooks
+  process_bcv_file, process_fixed_file, normalize_text, extract_date_from_text
 )

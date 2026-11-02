@@ -1,13 +1,11 @@
+# Build the all data scope through explicit dependencies; report rendering is separate.
+library(dplyr)
 source("R/source_helpers.R")
-
-run_script_isolated("scripts/run_prices.R")
-run_script_isolated("scripts/run_monetary.R")
-run_script_isolated("scripts/run_financial.R")
-run_script_isolated("scripts/run_oil.R")
-run_script_isolated("scripts/run_external.R")
-run_script_isolated("scripts/run_real.R")
-run_script_isolated("scripts/run_fiscal.R")
-run_script_isolated("scripts/report_01_data_layer.R")
-run_script_isolated("scripts/run_validate.R")
-# Render the configured client edition only after all domain contracts pass.
-run_script_isolated("scripts/run_report.R")
+source("R/data_contract_helpers.R")
+source("R/pipeline_helpers.R")
+arguments <- commandArgs(trailingOnly = TRUE)
+if (length(arguments) > 2L) {
+  rlang::abort("Supply a mode and, optionally, a failed run ID", class = "pipeline_arguments_error")
+}
+mode <- if (length(arguments)) arguments[[1]] else source_acquisition_mode()
+pipeline_run(target = "all", mode = mode, parent_run = if (length(arguments) == 2L) arguments[[2]] else "")

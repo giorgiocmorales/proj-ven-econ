@@ -11,12 +11,17 @@ ensure_project_dirs()
 
 # Fetch url ------
 url_hist <- "https://web2.xekura.io/json/VES/hist.json"
-resp <- GET(url_hist, timeout(45))
-stop_for_status(resp)
-
-# Get raw text ------
-raw_text <- content(resp, "text", encoding = "UTF-8")
-data_list <- fromJSON(raw_text)
+# Preserve the complete API response before parsing, including in response replays.
+raw_path <- "data/raw/yadio_hist.json"
+legacy_path <- "data/raw/external_04_fx_yadio.csv"
+if (source_acquisition_mode() != "update" && !file.exists(raw_path) && file.exists(legacy_path)) {
+  # The original acquisition retained its full parsed response, but not HTTP JSON bytes.
+  message("Using retained Yadio response table; historical HTTP JSON was not retained")
+  data_list <- readr::read_csv(legacy_path, show_col_types = FALSE)
+} else {
+  download_latest_file(url_hist, raw_path, max_attempts = 3, timeout_seconds = 45)
+  data_list <- fromJSON(raw_path)
+}
 
 # Reject schema drift before transforming or replacing the local history.
 required_columns <- c("date", "rate", "avg24h", "usdbtc")
@@ -43,7 +48,7 @@ if (nrow(ves_hist_clean) == 0 || anyNA(ves_hist_clean$date) ||
 }
 
 # Save ------
-write_csv(ves_hist_clean, "data/processed/external_04_fx_yadio.csv")
+write_csv(ves_hist_clean, "data/final/external_04_fx_yadio.csv")
 
 #Clean up -----
-rm(data_list, resp, ves_hist_clean, raw_text, url_hist)
+rm(data_list, ves_hist_clean, raw_path, url_hist)

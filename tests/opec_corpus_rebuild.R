@@ -1,8 +1,8 @@
 # Run after a successful corpus build to verify deterministic outputs and cache reuse.
 source("R/source_helpers.R")
-outputs <- c("data/processed/oil_13_momr_corpus.csv", "data/final/oil_13_momr_latest.csv",
-             "data/final/oil_13_momr_coverage.csv", "data/final/oil_13_momr_gaps.csv",
-             "data/final/oil_13_momr_report_audit.csv")
+outputs <- c("data/final/oil_13_momr_corpus.csv", "data/final/oil_13_momr_latest.csv",
+             "data/interim/oil_13_momr_coverage.csv", "data/interim/oil_13_momr_gaps.csv",
+             "data/interim/oil_13_momr_report_audit.csv")
 if (!all(file.exists(outputs))) {
   rlang::abort("Build the OPEC corpus before testing cached reproducibility", class = "opec_test_prerequisite")
 }

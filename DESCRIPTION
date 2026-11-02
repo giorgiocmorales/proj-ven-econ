@@ -7,8 +7,10 @@ Encoding: UTF-8
 Depends:
     R (>= 4.2)
 Imports:
+    digest,
     dplyr,
     egg,
+    forecast,
     ggplot2,
     glue,
     grid,

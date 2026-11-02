@@ -69,7 +69,8 @@ financial_series <- financial_series_raw %>%
     .data$sheet_name,
     .data$row_id,
     .data$column_id,
-    .data$downloaded_at
+    .data$downloaded_at,
+    .data$source_file_modified_at
   ) %>%
   dplyr::arrange(
     .data$dataset_family,

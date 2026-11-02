@@ -17,3 +17,16 @@ knitr::include_graphics(report_graphs[["oil_prices"]], rel_path = FALSE)
 ```
 
 {{< pagebreak >}}
+
+### Exportaciones de crudo y combustibles
+
+Los reportes de Reuters estiman los embarques de crudo y combustibles. La serie conserva la última cifra revisada por mes y señala en la base las citas secundarias y las diferencias entre versiones. Los datos de febrero de 2019, agosto de 2021 y diciembre de 2022 fueron aportados por el usuario y se identifican por separado en la base.
+
+```{r}
+#| label: oil-exports-figure
+
+# Display the reviewed monthly exports with the same cutoff as the report data layer.
+knitr::include_graphics(report_graphs[["oil_exports_reuters"]], rel_path = FALSE)
+```
+
+{{< pagebreak >}}

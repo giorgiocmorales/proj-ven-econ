@@ -2,6 +2,8 @@
 .Rhistory
 .RData
 .Ruserdata
+/.Renviron
+/.Renviron.*
 /Rplots.pdf
 
 renv/library/

@@ -7,8 +7,8 @@ source("R/source_helpers.R")
 
 # Retain source vintages and price bases so each selected rate remains auditable.
 dataset_id <- "real_11_gdp_growth_historical_bcv"
-historical_path <- "data/processed/real_09_gdp_historical_bcv.csv"
-annual_path <- "data/processed/real_01_gdp_a_a_bcv.csv"
+historical_path <- "data/final/real_09_gdp_historical_bcv.csv"
+annual_path <- "data/final/real_01_gdp_a_a_bcv.csv"
 historical <- read_csv(historical_path, show_col_types = FALSE)
 annual <- read_csv(annual_path, show_col_types = FALSE) %>%
   filter(.data$series_label == "Consolidado", .data$frequency == "annual",

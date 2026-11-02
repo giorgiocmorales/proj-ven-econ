@@ -10,7 +10,7 @@ ensure_project_dirs()
 # Define the auditable inputs and fail explicitly when either is unavailable.
 dataset_id <- "monetary_05_deposits_real_bcv"
 liquidity_path <- "data/final/monetary_02_liq_bcv.csv"
-cpi_path <- "data/processed/prices_01_cpi_bcv.csv"
+cpi_path <- "data/final/prices_01_cpi_bcv.csv"
 input_paths <- c(liquidity_path, cpi_path)
 missing_paths <- input_paths[!file.exists(input_paths)]
 

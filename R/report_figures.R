@@ -3,6 +3,7 @@
 # Annual goods and fiscal columns compare yearly magnitudes against zero.
 # Word/PNG exports share plots; facets retain independent units and colors identify sources.
 # Line graphs use solid lines without points; captions place notes above sources.
+dir.create("outputs/data", recursive = TRUE, showWarnings = FALSE)
 
 # Baseline: proj-ven-growth-scenarios/scripts/_presentation_theme.R.
 # Keep the report self-contained; scale the presentation typography to a Word page.

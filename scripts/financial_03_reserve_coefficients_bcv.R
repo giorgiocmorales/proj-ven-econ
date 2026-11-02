@@ -57,6 +57,22 @@ coefficients <- purrr::map_dfr(bcv_excel_sheets(raw_file), function(sheet_name) 
       11L, "other_financial_institutions", "marginal",
       12L, "other_financial_institutions", "special"
     )
+  } else if (ncol(sheet) == 11L &&
+             any(financial_ascii(sheet$col_03) == "por tipo de obligaciones", na.rm = TRUE)) {
+    # The September 2026 layout separates sight, savings, and term liabilities.
+    # Earlier ordinary coefficients remain in their original dated rows.
+    tibble::tribble(
+      ~column_id, ~institution_id, ~series_label_raw,
+      2L, "commercial_and_universal_banks", "ordinary",
+      3L, "commercial_and_universal_banks", "sight",
+      4L, "commercial_and_universal_banks", "savings",
+      5L, "commercial_and_universal_banks", "term",
+      6L, "commercial_and_universal_banks", "marginal",
+      8L, "other_financial_institutions", "ordinary",
+      9L, "other_financial_institutions", "sight",
+      10L, "other_financial_institutions", "savings",
+      11L, "other_financial_institutions", "term"
+    )
   } else {
     tibble::tribble(
       ~column_id, ~institution_id, ~series_label_raw,
@@ -136,7 +152,8 @@ coefficients_interim <- coefficients %>%
     .data$source_file,
     .data$source_vintage,
     .data$source_priority,
-    .data$downloaded_at
+    .data$downloaded_at,
+    .data$source_file_modified_at
   )
 
 write_interim_dataset(coefficients_interim, dataset_id)

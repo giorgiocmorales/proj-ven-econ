@@ -7,8 +7,7 @@ if (.Platform$OS.type == "windows" && !l10n_info()[["UTF-8"]]) {
   }
 }
 graph_registry <- readr::read_csv("registry/report_graphs.csv", show_col_types = FALSE)
-# The quarterly comparison consumes the annual GDP graph's validated data export.
-run_script_isolated("scripts/real_90_gdp_growth_graphs.R")
+# Reusable GDP reconstructions are published by the data pipeline, not graph scripts.
 for (graph_script in unique(graph_registry$script_path)) run_script_isolated(graph_script)
 asset_paths <- unique(c(graph_registry$image_path, graph_registry$data_path))
 if (!all(file.exists(asset_paths))) {
@@ -17,13 +16,11 @@ if (!all(file.exists(asset_paths))) {
 # A checksum receipt lets direct Quarto renders reject modified scripts, settings, or assets.
 input_paths <- unique(c(
   Sys.getenv("REPORT_CONFIG", "config/report.yml"), "R/report_inputs.R", "R/report_figures.R",
-  "scripts/report_02_graphs.R", "scripts/real_90_gdp_growth_graphs.R", graph_registry$script_path,
-  "registry/report_graphs.csv", "registry/report_availability.csv",
-  "registry/data_contracts.csv", "R/source_helpers.R",
-  "data/processed/real_09_gdp_historical_bcv.csv", "data/final/prices_05_daily_cpi_bcv.csv",
-  readr::read_csv("registry/report_availability.csv", show_col_types = FALSE)$file_path,
+  "scripts/report_02_graphs.R", graph_registry$script_path, "registry/report_graphs.csv",
+  "registry/report_series.csv", "registry/data_contracts.csv", "R/source_helpers.R",
+  unlist(strsplit(graph_registry$input_files, ";", fixed = TRUE)),
   readr::read_csv("registry/report_series.csv", show_col_types = FALSE)$source_file,
-  "data/final/report_series.csv", asset_paths
+  "output/reports/report_series.csv", asset_paths
 ))
 if (!all(file.exists(input_paths))) rlang::abort("Graph receipt has missing inputs", class = "report_graph_input_error")
 dir.create("output/reports", recursive = TRUE, showWarnings = FALSE)

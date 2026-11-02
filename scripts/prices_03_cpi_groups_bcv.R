@@ -35,12 +35,12 @@ for (id in unique(cpi$series_id)) {
   if (!identical(dates, seq(min(dates), max(dates), by = "month"))) stop("CPI group history contains gaps")
 }
 # Audit overlapping headline values; preserve both source extracts on a revision.
-headline_check <- readr::read_csv("data/processed/prices_01_cpi_bcv.csv", show_col_types = FALSE) %>%
+headline_check <- readr::read_csv("data/final/prices_01_cpi_bcv.csv", show_col_types = FALSE) %>%
   select(date, previous_index = cpi_index) %>%
   inner_join(cpi %>% filter(series_id == "headline") %>% select(date, cpi_index), by = "date") %>%
   mutate(relative_difference = cpi_index / previous_index - 1,
     agrees = abs(relative_difference) < 1e-8)
 write_interim_dataset(headline_check, "prices_03_headline_overlap_check")
-write_processed_dataset(cpi, dataset_id)
+write_final_dataset(cpi, dataset_id)
 message("Extracted ", nrow(cpi), " CPI values; headline overlap: ", sum(headline_check$agrees),
   "/", nrow(headline_check), " agree. Latest month: ", max(cpi$date))

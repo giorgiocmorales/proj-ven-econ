@@ -8,9 +8,15 @@ source("R/data_contract_helpers.R")
 ensure_project_dirs()
 
 contracts <- read_data_contracts(path = "registry/data_contracts.csv")
+# Data validation is independent of edition-specific report assemblies.
+contracts <- contracts %>% filter(startsWith(.data$file_path, "data/final/"))
+arguments <- commandArgs(trailingOnly = TRUE)
+if (length(arguments) > 1L) rlang::abort("Supply at most one validation reference date", class = "pipeline_arguments_error")
+reference_date <- if (length(arguments)) readr::parse_date(arguments[[1]], format = "%Y-%m-%d") else Sys.Date()
+if (is.na(reference_date)) rlang::abort("Invalid validation reference date", class = "pipeline_arguments_error")
 validation_results <- validate_data_contracts(
   contracts = contracts,
-  reference_date = Sys.Date()
+  reference_date = reference_date
 )
 
 dir.create("output/validation", recursive = TRUE, showWarnings = FALSE)

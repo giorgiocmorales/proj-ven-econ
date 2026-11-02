@@ -31,7 +31,7 @@ report_registry <- readr::read_csv(here::here("registry", "report_series.csv"), 
 report_dependencies <- here::here(c(
   unique(report_registry$source_file), "registry/report_series.csv", "scripts/report_01_data_layer.R"
 ))
-report_layer_path <- here::here("data", "final", "report_series.csv")
+report_layer_path <- here::here("output", "reports", "report_series.csv")
 if (!file.exists(report_layer_path) || any(file.mtime(report_dependencies) > file.mtime(report_layer_path))) {
   rlang::abort("Report layer is missing or older than its inputs. Run Rscript scripts/run_report.R", class = "report_cache_error")
 }

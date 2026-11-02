@@ -1,5 +1,5 @@
 # Quarterly BCV year-over-year growth; run after real_03_gdp_q_a_bcv.R.
-# The optional annual comparison uses the export from real_90_gdp_growth_graphs.R.
+# The combined view compares unadjusted QoQ and rolling-four-quarter GDP growth.
 library(tidyverse)
 
 if (.Platform$OS.type == "windows" && !l10n_info()[["UTF-8"]]) {
@@ -11,7 +11,7 @@ source("R/report_inputs.R")
 config <- read_report_config(path = Sys.getenv("REPORT_CONFIG", "config/report.yml"))
 cutoff <- as.Date(config$params$data_cutoff)
 
-source_file <- "data/processed/real_03_gdp_q_a_bcv.csv"
+source_file <- "data/final/real_03_gdp_q_a_bcv.csv"
 quarterly <- readr::read_csv(source_file, show_col_types = FALSE) %>%
   filter(series_label == "Consolidado", frequency == "quarterly", unit == "percent_yoy",
          lubridate::ceiling_date(date, "quarter") - lubridate::days(1) <= cutoff) %>%
@@ -41,8 +41,6 @@ provisional_note <- if (any(quarterly$provisional %in% TRUE)) {
 
 growth_style <- list(
 
-  scale_fill_manual(values = c("Expansión" = report_palette[["navy"]],
-    "Recesión" = report_palette[["red"]], "Sin variación" = "#b8c1c8")),
   geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid"),
   scale_y_continuous(
     labels = scales::label_number(suffix = "%", big.mark = ".", decimal.mark = ","),
@@ -52,11 +50,13 @@ growth_style <- list(
   ),
   report_chart_theme
 )
-build_quarterly <- function(data, every_quarter = FALSE) {
+build_quarterly <- function(data, every_quarter) {
   breaks <- if (every_quarter) data$date else sort(unique(c(
     min(data$date), data$date[data$quarter == 1L], max(data$date))))
   ggplot(data, aes(date, growth, fill = phase)) +
     geom_col(width = 66) + growth_style +
+    scale_fill_manual(values = c("Expansión" = report_palette[["navy"]],
+      "Recesión" = report_palette[["red"]], "Sin variación" = "#b8c1c8")) +
     scale_x_date(breaks = breaks, labels = quarter_label,
                  expand = expansion(add = 65)) +
     labs(title = "Venezuela: crecimiento trimestral del PIB real",
@@ -67,39 +67,82 @@ build_quarterly <- function(data, every_quarter = FALSE) {
                       "Fuentes: BCV; PIB consolidado por actividad económica.", sep = "\n")) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 }
-figures <- list(real_gdp_growth_quarterly = build_quarterly(quarterly),
+figures <- list(real_gdp_growth_quarterly = build_quarterly(quarterly, FALSE),
                 real_gdp_growth_quarterly_recent = build_quarterly(recent, TRUE))
 
-annual_file <- "data/final/real_90_gdp_growth.csv"
-if (file.exists(annual_file)) {
-  annual <- readr::read_csv(annual_file, show_col_types = FALSE) %>%
-    filter(year >= lubridate::year(recent_start), year <= max(quarterly$year),
-           lubridate::make_date(year, 12L, 31L) <= cutoff)
-  if (!nrow(annual) || anyDuplicated(annual$year) || any(!is.finite(annual$growth))) {
-    stop("Annual comparison requires unique, finite annual growth observations")
-  }
-  comparison <- bind_rows(
-    annual %>% transmute(period = as.character(year), growth, phase,
-                         panel = "Anual", source_file, source_detail),
-    recent %>% transmute(period = quarter_label(date), growth, phase,
-                         panel = "Trimestral interanual", source_file, source_detail)
-  ) %>% mutate(panel = factor(panel, levels = c("Anual", "Trimestral interanual")),
-               period = factor(period, levels = unique(period)))
-  figures$real_gdp_growth_annual_quarterly <- ggplot(comparison, aes(period, growth, fill = phase)) +
-    geom_col(width = 0.72) + growth_style +
-    facet_wrap(~panel, nrow = 1, scales = "free_x") +
-    labs(title = "Venezuela: crecimiento del PIB real",
-      subtitle = "Variación interanual (%) | Perspectiva anual y trimestral; escala vertical común",
-      x = NULL, y = NULL,
-      caption = paste(provisional_note,
-                      "Tasas anuales publicadas; no son promedios de las tasas trimestrales.",
-                      "Fuentes: BCV.", sep = "\n")) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-  readr::write_csv(comparison, "data/final/real_91_gdp_comparison_graph.csv")
+# Use inferred levels to compare the latest four quarters with the preceding four.
+# Preserve the published quarterly rates and verify the annual benchmark at each Q4.
+reconciled_file <- "data/final/real_10_gdp_quarterly_bcv.csv"
+reconciled <- readr::read_csv(reconciled_file, show_col_types = FALSE) %>%
+  filter(family == "activity", series_label == "Consolidado",
+         date >= recent_start,
+         lubridate::ceiling_date(date, "quarter") - lubridate::days(1) <= cutoff) %>%
+  select(date, published_yoy_percent, qoq_unadjusted_percent, rolling_four_quarter_yoy_percent,
+         annual_source_file, quarterly_source_file, reconstruction_uses_provisional_data)
+if (anyDuplicated(reconciled$date) || !setequal(recent$date, reconciled$date)) {
+  rlang::abort("Reconciled GDP must cover every plotted quarter exactly once",
+               class = "gdp_graph_reconciliation_error")
 }
-dir.create("data/final", recursive = TRUE, showWarnings = FALSE)
+combined <- recent %>% left_join(reconciled, by = "date")
+if (any(!is.finite(combined$qoq_unadjusted_percent)) ||
+    any(!is.finite(combined$rolling_four_quarter_yoy_percent)) ||
+    anyNA(combined$published_yoy_percent) ||
+    any(abs(combined$growth - combined$published_yoy_percent) > 1e-6)) {
+  rlang::abort("Reconciled GDP is missing or differs from the published quarterly rates",
+               class = "gdp_graph_reconciliation_error")
+}
+annual_file <- "data/final/real_01_gdp_a_a_bcv.csv"
+annual <- readr::read_csv(annual_file, show_col_types = FALSE) %>%
+  filter(series_label == "Consolidado", frequency == "annual", unit == "percent_yoy",
+         year >= lubridate::year(recent_start), year <= max(combined$year),
+         lubridate::make_date(year, 12L, 31L) <= cutoff) %>%
+  transmute(year = as.integer(year), annual_growth = value)
+annual_check <- combined %>% filter(quarter == 4L) %>% left_join(annual, by = "year")
+if (!nrow(annual_check) || anyDuplicated(annual$year) ||
+    !setequal(annual$year, annual_check$year) || any(!is.finite(annual_check$annual_growth)) ||
+    any(abs(annual_check$rolling_four_quarter_yoy_percent - annual_check$annual_growth) > 1e-6)) {
+  rlang::abort("Rolling-four-quarter growth must match every published annual benchmark",
+               class = "gdp_graph_reconciliation_error")
+}
+
+# Retain exact plotted values and input provenance in a single auditable long export.
+comparison <- combined %>%
+  rename(published_quarter_yoy_percent = growth) %>%
+  pivot_longer(cols = c(qoq_unadjusted_percent, rolling_four_quarter_yoy_percent),
+               names_to = "measure", values_to = "growth") %>%
+  mutate(series = if_else(measure == "qoq_unadjusted_percent", "Trimestral (t/t)",
+                         "Últimos cuatro trimestres (a/a)"),
+         source_file = reconciled_file)
+
+# Bars show unadjusted adjacent-quarter growth; the line retains four-quarter YoY growth.
+# Calendar-year ticks stay horizontal; the last tick identifies the latest observed quarter.
+last_date <- max(combined$date)
+year_breaks <- combined$date[combined$quarter == 1L &
+                              combined$date <= last_date - lubridate::days(180)]
+figures$real_gdp_growth_annual_quarterly <- ggplot(comparison, aes(date, growth)) +
+  geom_col(data = comparison %>% filter(measure == "qoq_unadjusted_percent"),
+           aes(fill = series), width = 66) +
+  geom_line(data = comparison %>% filter(measure == "rolling_four_quarter_yoy_percent"),
+            aes(color = series), linewidth = 0.9) +
+  growth_style +
+  scale_fill_manual(values = c("Trimestral (t/t)" = report_palette[["navy"]])) +
+  scale_color_manual(values = c("Últimos cuatro trimestres (a/a)" = report_palette[["yellow"]])) +
+  scale_x_date(breaks = sort(unique(c(year_breaks, last_date))),
+               labels = function(x) if_else(x == last_date, quarter_label(x),
+                                            as.character(lubridate::year(x))),
+               expand = expansion(add = 65)) +
+  labs(title = "Venezuela: crecimiento del PIB real",
+    subtitle = paste0("Variaciones porcentuales, sin desestacionalizar | ", quarter_label(min(combined$date)),
+                      "–", quarter_label(last_date)),
+    x = NULL, y = NULL,
+    caption = paste(
+      "Notas: barras: trimestre frente al anterior; línea: últimos cuatro trimestres frente a los cuatro anteriores.",
+      "En T4, la línea coincide con la tasa anual del BCV. Cálculo con niveles reconciliados; incluye cifras provisionales.",
+      "Fuentes: BCV; cálculos propios.", sep = "\n"))
+readr::write_csv(comparison, "outputs/data/real_91_gdp_comparison_graph.csv")
+dir.create("outputs/data", recursive = TRUE, showWarnings = FALSE)
 dir.create("outputs/figures", recursive = TRUE, showWarnings = FALSE)
-readr::write_csv(quarterly, "data/final/real_91_gdp_quarterly_graph.csv")
+readr::write_csv(quarterly, "outputs/data/real_91_gdp_quarterly_graph.csv")
 for (figure_name in names(figures)) {
   ggsave(paste0("outputs/figures/", figure_name, ".png"), figures[[figure_name]],
     width = 10, height = 5.625, units = "in", dpi = 300, device = ragg::agg_png, bg = "white")

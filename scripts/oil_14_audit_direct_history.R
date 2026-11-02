@@ -27,7 +27,7 @@ if (anyDuplicated(manual$date) || any(!is.finite(manual$reference_value))) {
 }
 
 # Compare every available MOMR vintage, so ordinary revisions are not mistaken for errors.
-corpus <- read_csv("data/processed/oil_13_momr_corpus.csv", show_col_types = FALSE,
+corpus <- read_csv("data/final/oil_13_momr_corpus.csv", show_col_types = FALSE,
                    col_types = cols(footnote_marker = col_character()))
 readr::stop_for_problems(corpus)
 direct <- corpus %>% filter(.data$series_id == "venezuela", .data$source_type == "direct")

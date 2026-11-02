@@ -20,23 +20,23 @@ cutoff <- as.Date(config$params$data_cutoff)
 # Use official historical growth through 2007 and the revised activity series from 2008.
 # Historical growth was calculated within the 1997 price base by the source pipeline.
 historical_growth <- readr::read_csv(
-  "data/processed/real_09_gdp_historical_bcv.csv", show_col_types = FALSE
+  "data/final/real_09_gdp_historical_bcv.csv", show_col_types = FALSE
 ) %>%
   filter(.data$base_year == 1997L, between(.data$year, 1999, 2007)) %>%
   transmute(
     year = as.integer(.data$year), growth = .data$growth_percent, provisional,
-    source_id, source_file = "data/processed/real_09_gdp_historical_bcv.csv",
+    source_id, source_file = "data/final/real_09_gdp_historical_bcv.csv",
     source_detail = .data$source_url
   )
 
 bcv_growth <- readr::read_csv(
-  "data/processed/real_01_gdp_a_a_bcv.csv", show_col_types = FALSE
+  "data/final/real_01_gdp_a_a_bcv.csv", show_col_types = FALSE
 ) %>%
   filter(.data$series_label == "Consolidado", .data$frequency == "annual",
          .data$unit == "percent_yoy", between(.data$year, 2008, 2025)) %>%
   transmute(
     year = as.integer(.data$year), growth = .data$value, provisional,
-    source_id, source_file = "data/processed/real_01_gdp_a_a_bcv.csv",
+    source_id, source_file = "data/final/real_01_gdp_a_a_bcv.csv",
     source_detail = .data$source_url
   )
 
@@ -86,9 +86,9 @@ gdp_growth_figure <- gdp_growth %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 
 # Export the exact plotted observations and both raster and vector chart assets.
-dir.create("data/final", recursive = TRUE, showWarnings = FALSE)
+dir.create("outputs/data", recursive = TRUE, showWarnings = FALSE)
 dir.create("outputs/figures", recursive = TRUE, showWarnings = FALSE)
-readr::write_csv(gdp_growth, "data/final/real_90_gdp_growth.csv")
+readr::write_csv(gdp_growth, "outputs/data/real_90_gdp_growth.csv")
 ggsave("outputs/figures/real_gdp_growth_1999_2025.png", plot = gdp_growth_figure,
        width = 10, height = 5.625, units = "in", dpi = 300,
        device = ragg::agg_png, bg = "white")

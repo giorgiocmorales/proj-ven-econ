@@ -1,7 +1,7 @@
 # Derive monthly and year-on-year rates from consecutive monthly CPI levels.
 library(tidyverse)
 source("R/source_helpers.R")
-cpi <- readr::read_csv("data/processed/prices_03_cpi_groups_bcv.csv", show_col_types = FALSE)
+cpi <- readr::read_csv("data/final/prices_03_cpi_groups_bcv.csv", show_col_types = FALSE)
 if (anyDuplicated(cpi[c("series_id", "date")]) || anyNA(cpi$date) ||
     any(!is.finite(cpi$cpi_index) | cpi$cpi_index <= 0)) stop("Invalid CPI input")
 for (id in c("headline", "food")) {

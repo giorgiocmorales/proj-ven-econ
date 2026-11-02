@@ -5,7 +5,7 @@ library(lubridate)
 source("R/source_helpers.R")
 ensure_project_dirs()
 
-oil_prod <- read_csv("data/processed/oil_13_momr_corpus.csv", show_col_types = FALSE,
+oil_prod <- read_csv("data/final/oil_13_momr_corpus.csv", show_col_types = FALSE,
                      col_types = cols(footnote_marker = col_character()))
 readr::stop_for_problems(oil_prod)
 oil_prod <- oil_prod %>%
@@ -16,7 +16,7 @@ oil_prod <- oil_prod %>%
          observation_month = .data$report_month %m-% months(1),
          source_url = "https://www.opec.org/monthly-oil-market-report.html")
 if (nrow(oil_prod) == 0L) rlang::abort("No Venezuela production in the corpus", class = "opec_view_error")
-write_processed_dataset(oil_prod, "oil_01_prod_opec")
+write_final_dataset(oil_prod, "oil_01_prod_opec")
 
 # The newest published cell wins, including an explicitly unreported value.
 oil_prod %>% arrange(.data$report_month) %>%

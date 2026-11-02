@@ -1,12 +1,11 @@
+# Build the real data scope through explicit dependencies; report rendering is separate.
+library(dplyr)
 source("R/source_helpers.R")
-
-run_script_isolated("scripts/real_01_gdp_a_a_bcv.R")
-run_script_isolated("scripts/real_02_gdp_a_s_bcv.R")
-run_script_isolated("scripts/real_03_gdp_q_a_bcv.R")
-run_script_isolated("scripts/real_04_gdp_q_s_bcv.R")
-run_script_isolated("scripts/real_05_gdp_imf.R")
-run_script_isolated("scripts/real_06_gdp_wb.R")
-run_script_isolated("scripts/real_07_gdppc_wb.R")
-run_script_isolated("scripts/real_08_incpc_wb.R")
-run_script_isolated("scripts/real_09_gdp_historical_bcv.R")
-run_script_isolated("scripts/real_11_gdp_growth_historical_bcv.R")
+source("R/data_contract_helpers.R")
+source("R/pipeline_helpers.R")
+arguments <- commandArgs(trailingOnly = TRUE)
+if (length(arguments) > 2L) {
+  rlang::abort("Supply a mode and, optionally, a failed run ID", class = "pipeline_arguments_error")
+}
+mode <- if (length(arguments)) arguments[[1]] else source_acquisition_mode()
+pipeline_run(target = "real", mode = mode, parent_run = if (length(arguments) == 2L) arguments[[2]] else "")

@@ -11,7 +11,7 @@ dataset_id <- "real_09_gdp_historical_bcv"
 source_url <- "https://bcv.org.ve/sites/default/files/cuentas_macroeconomicas/7_1_14_anual.xls"
 raw_path <- "data/raw/bcv_gdp_historical.xls"
 download_latest_file(source_url, raw_path, max_attempts = 3, timeout_seconds = 120)
-downloaded_at <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+downloaded_at <- source_retrieval_time(raw_path, dataset_id)
 
 # Base-year headings precede observations; retain overlap years under both bases.
 gdp_historical <- read_bcv_sheet(raw_path, sheet = "7_1_14", col_names = FALSE) %>%
@@ -57,4 +57,4 @@ gdp_historical <- gdp_historical %>%
     dataset_id = dataset_id, source_id = "bcv", source_url = source_url,
     sheet_name = "7_1_14", downloaded_at = downloaded_at
   )
-write_processed_dataset(gdp_historical, dataset_id)
+write_final_dataset(gdp_historical, dataset_id)

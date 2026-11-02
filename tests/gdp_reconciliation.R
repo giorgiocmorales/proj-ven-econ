@@ -6,7 +6,7 @@ project_root <- normalizePath(".", winslash = "/", mustWork = TRUE)
 script_path <- file.path(project_root, "scripts/real_10_gdp_reconciliation_bcv.R")
 fixture_root <- tempfile(pattern = "gdp_reconciliation_")
 dir.create(file.path(fixture_root, "R"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(fixture_root, "data/processed"), recursive = TRUE, showWarnings = FALSE)
+dir.create(file.path(fixture_root, "data/final"), recursive = TRUE, showWarnings = FALSE)
 stopifnot(file.copy(file.path(project_root, "R/source_helpers.R"),
                    file.path(fixture_root, "R/source_helpers.R")))
 
@@ -54,10 +54,10 @@ local({
       expected_class <- "gdp_reconciliation_rank_error"
     }
     for (annual_file in c("real_01_gdp_a_a_bcv", "real_02_gdp_a_s_bcv")) {
-      write_csv(a, paste0("data/processed/", annual_file, ".csv"))
+      write_csv(a, paste0("data/final/", annual_file, ".csv"))
     }
     for (quarterly_file in c("real_03_gdp_q_a_bcv", "real_04_gdp_q_s_bcv")) {
-      write_csv(q, paste0("data/processed/", quarterly_file, ".csv"))
+      write_csv(q, paste0("data/final/", quarterly_file, ".csv"))
     }
     if (case != "valid") {
       previous_hashes <- tools::md5sum(c("data/final/real_10_gdp_quarterly_bcv.csv",

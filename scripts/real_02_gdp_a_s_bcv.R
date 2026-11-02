@@ -13,8 +13,8 @@ source_id <- "bcv"
 source_url <- "https://bcv.org.ve/sites/default/files/cuentas_macroeconomicas/5_2_1_si_anual.xlsx"
 raw_path <- file.path("data", "raw", "bcv_gdp_a_s.xlsx")
 
-downloaded_at <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
 download_latest_file(source_url, raw_path)
+downloaded_at <- source_retrieval_time(raw_path, dataset_id)
 
 gdp_sheet <- read_bcv_sheet(raw_path, sheet = "Var_pun%", col_names = FALSE) %>%
   as_tibble(.name_repair = "unique")
@@ -57,4 +57,4 @@ gdp_a_sector_raw <- gdp_sheet %>%
   ) %>%
   filter(!is.na(value))
 
-write_processed_dataset(gdp_a_sector_raw, dataset_id)
+write_final_dataset(gdp_a_sector_raw, dataset_id)

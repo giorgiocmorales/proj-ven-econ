@@ -24,6 +24,9 @@ if (length(missing_columns) > 0) {
 purrr::pwalk(
   source_registry %>% dplyr::select(.data$source_url, .data$raw_file),
   function(source_url, raw_file) {
+    # Historical releases are immutable inputs; an explicit update refreshes current files.
+    if (source_acquisition_mode() == "update" && file.exists(raw_file) &&
+        !grepl("_current[.]", raw_file)) return(invisible(raw_file))
     download_latest_file(
       url = source_url,
       dest_path = raw_file,

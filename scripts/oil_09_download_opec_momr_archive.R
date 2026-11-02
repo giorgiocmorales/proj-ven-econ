@@ -4,6 +4,7 @@ library(tidyverse)
 
 source("R/source_helpers.R")
 source("R/opec_helpers.R")
+source("R/opec_download_helpers.R")
 
 ensure_project_dirs()
 
@@ -47,6 +48,19 @@ if (nrow(reports) == 0L) {
   stop("No eligible OPEC MOMR reports were found for the requested date range.", call. = FALSE)
 }
 
+# Check the live latest-report endpoint alongside the registry's archive URLs.
+# Its delivery URL is eligible only for the publication month named on that page.
+latest <- if (source_acquisition_mode() == "update") {
+  tryCatch(discover_opec_latest_report(timeout_seconds = 20), error = identity)
+} else tibble(report_month = as.Date(character()), pdf_url = character())
+if (inherits(latest, "error")) {
+  warning(paste("OPEC latest-report discovery failed:", conditionMessage(latest)), call. = FALSE)
+  readr::write_csv(tibble(status = "error", details = conditionMessage(latest)), "data/raw/opec_latest_discovery.csv")
+  latest <- tibble(report_month = as.Date(character()), pdf_url = character())
+} else {
+  readr::write_csv(latest %>% mutate(status = "ok"), "data/raw/opec_latest_discovery.csv")
+}
+
 download_log <- purrr::pmap_dfr(reports, function(...) {
   report <- tibble::as_tibble(list(...))
   report_month <- report$report_month[[1]]
@@ -85,31 +99,36 @@ download_log <- purrr::pmap_dfr(reports, function(...) {
 
   tryCatch(
     {
-      # Validate the downloaded container before replacing any archived report.
+      # Try the registered archive and the matching live issue in a fixed order.
+      # Keep URL-specific failures visible if neither source can provide the issue.
       staged_path <- paste0(pdf_path, ".staged.pdf")
-      download_latest_file(
-        url = report$pdf_url[[1]],
-        dest_path = staged_path,
-        max_attempts = max_attempts,
-        timeout_seconds = timeout_seconds
-      )
-      if (!identical(rawToChar(readBin(staged_path, "raw", n = 5L)), "%PDF-") ||
-          pdftools::pdf_info(staged_path)$pages <= 4L) {
-        stop("Downloaded response is not a valid multi-page PDF", call. = FALSE)
+      # A manually supplied issue can retain a rolling source URL in its provenance.
+      # Use dated archive candidates for that row; gate the rolling URL by the live month.
+      archive_urls <- report$pdf_url[[1]]
+      if (stringr::str_detect(archive_urls, "momr\\.opec\\.org/pdf-download/")) {
+        month_id <- as.integer(format(report_month, "%m"))
+        slugs <- unique(tolower(c(month.name[month_id], month.abb[month_id])))
+        archive_urls <- sprintf("https://www.opec.org/assets/assetdb/momr-%s-%s.pdf",
+                                 slugs, format(report_month, "%Y"))
       }
+      urls <- unique(c(archive_urls, latest$pdf_url[latest$report_month == report_month]))
+      downloaded <- download_opec_report_pdf(urls = urls, file_path = staged_path,
+        report_month = report_month, max_attempts = max_attempts, timeout_seconds = timeout_seconds)
       if (!file.copy(staged_path, pdf_path, overwrite = TRUE)) {
         stop("Could not archive validated PDF", call. = FALSE)
       }
       unlink(staged_path)
       readr::write_csv(tibble(
-        pdf_url = report$pdf_url[[1]], pdf_md5 = unname(tools::md5sum(pdf_path)),
+        pdf_url = report$pdf_url[[1]], download_url = downloaded$download_url,
+        attempt_errors = downloaded$attempt_errors,
+        pdf_md5 = unname(tools::md5sum(pdf_path)),
         recorded_at = format(Sys.time(), "%Y-%m-%d %H:%M:%S"), validation = "download_validated"
       ), receipt_path)
 
       tibble::tibble(
         report_month = report_month,
         observation_month = report$observation_month[[1]],
-        pdf_url = report$pdf_url[[1]],
+        pdf_url = downloaded$download_url,
         pdf_path = pdf_path,
         status = "downloaded",
         error_message = NA_character_,

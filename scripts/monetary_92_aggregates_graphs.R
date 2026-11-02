@@ -70,10 +70,10 @@ for (id in c("monetary_base", "liquidez_monetaria")) {
 if (any(!is.finite(chart_data$real_ves)) || any(!is.finite(chart_data$nominal_growth_yoy))) {
   stop("Charts require complete CPI and prior-year monetary comparisons")
 }
-readr::write_csv(aggregates, "data/final/monetary_92_aggregates.csv")
+readr::write_csv(aggregates, "outputs/data/monetary_92_aggregates.csv")
 readr::write_csv(weekly %>% select(variable_id, date, week, month, cpi_index,
   previous_observation_date, interval_days, inflation_since_previous_pct),
-  "data/final/monetary_92_weekly_coverage.csv")
+  "outputs/data/monetary_92_weekly_coverage.csv")
 # Count the days contributed by each month to every displayed observation interval.
 # The interval is (previous observation, current observation], avoiding double counting.
 weekly_inflation_parts <- chart_data %>%
@@ -95,8 +95,8 @@ if (nrow(weekly_inflation_check) != nrow(chart_data) ||
             weekly_inflation_check$inflation_since_previous_pct) > 1e-8)) {
   stop("Daily factors do not reconcile with weekly CPI changes")
 }
-readr::write_csv(weekly_inflation_parts, "data/final/monetary_92_weekly_inflation_parts.csv")
-readr::write_csv(weekly_inflation_check, "data/final/monetary_92_weekly_inflation.csv")
+readr::write_csv(weekly_inflation_parts, "outputs/data/monetary_92_weekly_inflation_parts.csv")
+readr::write_csv(weekly_inflation_check, "outputs/data/monetary_92_weekly_inflation.csv")
 real_breaks <- pretty(c(0, chart_data$real_ves / 1e12), n = 7)
 growth_breaks <- pretty(c(0, chart_data$nominal_growth_yoy * 1.03), n = 7)
 real_figure <- chart_data %>%

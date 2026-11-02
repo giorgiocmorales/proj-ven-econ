@@ -9,8 +9,8 @@ ensure_project_dirs()
 # Keep source families separate: activity and institutional-sector totals overlap.
 source_pairs <- tribble(
   ~family, ~annual_file, ~quarterly_file,
-  "activity", "data/processed/real_01_gdp_a_a_bcv.csv", "data/processed/real_03_gdp_q_a_bcv.csv",
-  "institutional", "data/processed/real_02_gdp_a_s_bcv.csv", "data/processed/real_04_gdp_q_s_bcv.csv"
+  "activity", "data/final/real_01_gdp_a_a_bcv.csv", "data/final/real_03_gdp_q_a_bcv.csv",
+  "institutional", "data/final/real_02_gdp_a_s_bcv.csv", "data/final/real_04_gdp_q_s_bcv.csv"
 )
 base_year <- 2007L
 index_base_annual_total <- 100
@@ -37,7 +37,7 @@ for (pair_id in seq_len(nrow(source_pairs))) {
     if (!all(required_columns %in% names(input))) {
       rlang::abort("Missing required BCV GDP columns", class = "gdp_reconciliation_input_error")
     }
-    if (!nrow(input) || anyNA(input[required_columns]) ||
+    if (!nrow(input) || anyNA(input[setdiff(required_columns, "downloaded_at")]) ||
         any(!is.finite(input$value)) || any(input$value <= -100) ||
         any(input$unit != "percent_yoy") || any(input$frequency != frequency_id) ||
         any(input$year != as.integer(input$year)) || any(!nzchar(input$series_label)) ||
@@ -238,7 +238,7 @@ write_final_dataset(quarterly_data, "real_10_gdp_quarterly_bcv")
 write_final_dataset(annual_data, "real_10_gdp_annual_bcv")
 
 # Historical published levels have a different price base and vintage; do not splice.
-historical_path <- "data/processed/real_09_gdp_historical_bcv.csv"
+historical_path <- "data/final/real_09_gdp_historical_bcv.csv"
 if (file.exists(historical_path)) {
   historical <- read_csv(historical_path, show_col_types = FALSE) %>%
     filter(base_year == 1997L) %>%

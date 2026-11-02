@@ -34,11 +34,11 @@ if (length(missing_registry_columns) > 0) {
 }
 
 annual_bop <- readr::read_csv(
-  "data/processed/external_05_bop_a_bcv.csv",
+  "data/final/external_05_bop_a_bcv.csv",
   show_col_types = FALSE
 )
 quarterly_bop <- readr::read_csv(
-  "data/processed/external_06_bop_q_bcv.csv",
+  "data/final/external_06_bop_q_bcv.csv",
   show_col_types = FALSE
 )
 

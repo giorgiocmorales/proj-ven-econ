@@ -39,7 +39,7 @@ if (nrow(duplicate_registry_rows) > 0) {
 }
 
 gdp_bcv <- readr::read_csv(
-  "data/processed/real_01_gdp_a_a_bcv.csv",
+  "data/final/real_01_gdp_a_a_bcv.csv",
   show_col_types = FALSE
 ) %>%
   transmute(
@@ -56,7 +56,7 @@ gdp_bcv <- readr::read_csv(
   )
 
 gdp_imf <- readr::read_csv(
-  "data/processed/real_05_gdp_imf.csv",
+  "data/final/real_05_gdp_imf.csv",
   show_col_types = FALSE
 ) %>%
   transmute(
@@ -73,7 +73,7 @@ gdp_imf <- readr::read_csv(
   )
 
 # Use the current headline group table shared by the approved inflation graph scripts.
-cpi_headline <- readr::read_csv("data/processed/prices_03_cpi_groups_bcv.csv", show_col_types = FALSE) %>%
+cpi_headline <- readr::read_csv("data/final/prices_03_cpi_groups_bcv.csv", show_col_types = FALSE) %>%
   filter(.data$series_id == "headline") %>%
   mutate(variable_id = "cpi_index", value = .data$cpi_index)
 headline_rates <- readr::read_csv("data/final/prices_04_inflation_groups_bcv.csv", show_col_types = FALSE) %>%
@@ -158,6 +158,23 @@ oil_price <- readr::read_csv(
     downloaded_at = NA_character_
   )
 
+# Preserve reported shipment estimates and selected evidence; gaps stay in the source table.
+oil_exports <- readr::read_csv("data/final/oil_15_exports_reuters_monthly.csv", show_col_types = FALSE,
+  col_types = cols(raw_value = col_character())) %>%
+  filter(!is.na(.data$exports_bpd)) %>%
+  transmute(
+    source_key = "oil_exports", source_series = "crude_and_fuel", source_frequency = "monthly",
+    date = .data$date, value = .data$exports_thousand_bpd,
+    provisional = TRUE,
+    source_id = if_else(any(.data$access == "user_supplied"), "reuters_and_user", "reuters"),
+    dataset_id = "oil_15_exports_reuters",
+    source_url = .data$source_url, source_date = .data$source_date,
+    source_record_id = .data$source_id, source_evidence_id = .data$evidence_id,
+    source_status = .data$status, source_access = .data$access,
+    raw_value = as.character(.data$raw_value), raw_unit = .data$raw_unit,
+    retrieved_date = .data$retrieved_date, downloaded_at = NA_character_
+  )
+
 bop_goods <- readr::read_csv(
   "data/final/external_bop_goods.csv",
   show_col_types = FALSE
@@ -176,7 +193,7 @@ bop_goods <- readr::read_csv(
   )
 
 fiscal_balance <- readr::read_csv(
-  "data/processed/fiscal_05_components_imf.csv",
+  "data/final/fiscal_05_components_imf.csv",
   show_col_types = FALSE
 ) %>%
   transmute(
@@ -199,6 +216,7 @@ source_data <- bind_rows(
   fx_bcv,
   oil_production,
   oil_price,
+  oil_exports,
   bop_goods,
   fiscal_balance
 )
@@ -226,6 +244,14 @@ report_series <- source_data %>%
     source_series = .data$source_series,
     source_frequency = .data$source_frequency,
     report_month = .data$report_month,
+    source_date = .data$source_date,
+    source_record_id = .data$source_record_id,
+    source_evidence_id = .data$source_evidence_id,
+    source_status = .data$source_status,
+    source_access = .data$source_access,
+    raw_value = .data$raw_value,
+    raw_unit = .data$raw_unit,
+    retrieved_date = .data$retrieved_date,
     downloaded_at = .data$downloaded_at
   ) %>%
   arrange(.data$section, .data$variable_id, .data$date)
@@ -260,4 +286,6 @@ if (any(is.na(report_series$value))) {
   stop("Report data layer contains missing values", call. = FALSE)
 }
 
-write_final_dataset(report_series, "report_series")
+# This edition assembly is downstream of reusable final datasets.
+dir.create("output/reports", recursive = TRUE, showWarnings = FALSE)
+readr::write_csv(report_series, "output/reports/report_series.csv")

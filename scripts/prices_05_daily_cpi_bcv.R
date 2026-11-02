@@ -1,8 +1,8 @@
 # Estimated daily CPI path: constant compound daily inflation within each month.
 # Published monthly indices are treated as month-end anchors for this allocation.
 library(tidyverse)
-cpi_path <- if (file.exists("data/processed/prices_03_cpi_groups_bcv.csv"))
-  "data/processed/prices_03_cpi_groups_bcv.csv" else "data/processed/prices_01_cpi_bcv.csv"
+cpi_path <- if (file.exists("data/final/prices_03_cpi_groups_bcv.csv"))
+  "data/final/prices_03_cpi_groups_bcv.csv" else "data/final/prices_01_cpi_bcv.csv"
 cpi <- readr::read_csv(cpi_path, show_col_types = FALSE)
 if ("series_id" %in% names(cpi)) cpi <- cpi %>% filter(series_id == "headline")
 cpi <- cpi %>% select(month = date, cpi_index, provisional) %>% arrange(month)

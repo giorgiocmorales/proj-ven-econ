@@ -47,6 +47,7 @@ last_date <- max(plotted$date)
 first_date <- min(plotted$date)
 coverage <- map_dfr(c("official", "unofficial", "gap_pct", "gap_ma30_pct"), function(series) {
   dates <- plotted$date[is.finite(plotted[[series]])]
+  if (!length(dates)) stop(paste("No plotted observations for", series))
   tibble(series, first_date = min(dates), last_date = max(dates), observations = length(dates))
 })
 date_breaks <- sort(unique(c(first_date,
@@ -76,10 +77,10 @@ rates_figure <- ggplot(rates, aes(date, value, color = series)) +
     breaks = ~sort(unique(c(.x, pretty(.x, n = 7)))),
     expand = expansion(mult = 0)
   ) +
-  labs(title = "Venezuela: tipo de cambio oficial y no oficial",
-    subtitle = paste0("Series diarias, bolívares actuales por USD | ", period_label),
-    x = NULL, y = NULL,
-    caption = paste0("Notas: la serie consolidada conserva el último valor entre observaciones de cada fuente.\n",
+  labs(title = "Venezuela: tipos de cambio",
+    subtitle = paste0("Series diarias | ", period_label),
+    x = NULL, y = "Bolívares actuales por USD",
+    caption = paste0("Notas: oficial y Yadio conservan el último valor entre observaciones.\n",
       "Fuentes: BCV (SMC) y Yadio (tipo implícito).")) +
   common_axes
 gap_figure <- ggplot(plotted, aes(date)) +
@@ -103,9 +104,9 @@ gap_figure <- ggplot(plotted, aes(date)) +
   common_axes
 
 dir.create("outputs/figures", recursive = TRUE, showWarnings = FALSE)
-dir.create("data/final", recursive = TRUE, showWarnings = FALSE)
-readr::write_csv(plotted, "data/final/external_99_fx_graph.csv")
-readr::write_csv(coverage, "data/final/external_99_fx_graph_coverage.csv")
+dir.create("outputs/data", recursive = TRUE, showWarnings = FALSE)
+readr::write_csv(plotted, "outputs/data/external_99_fx_graph.csv")
+readr::write_csv(coverage, "outputs/data/external_99_fx_graph_coverage.csv")
 figures <- list(external_fx_daily = rates_figure, external_fx_gap_daily_ma30 = gap_figure)
 for (figure_name in names(figures)) {
   ggsave(paste0("outputs/figures/", figure_name, ".png"), figures[[figure_name]],

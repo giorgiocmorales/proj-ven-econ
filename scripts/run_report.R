@@ -13,6 +13,7 @@ if (.Platform$OS.type == "windows" && !l10n_info()[["UTF-8"]]) {
 
 config_path <- normalizePath(Sys.getenv("REPORT_CONFIG", "config/report.yml"), winslash = "/", mustWork = TRUE)
 config <- read_report_config(path = config_path)
+# Rendering consumes published datasets; source updates are separate data procedures.
 run_script_isolated("scripts/report_00_availability.R")
 validate_report_sources(
   registry_path = "registry/report_series.csv",
@@ -34,7 +35,7 @@ snapshot_paths <- c("output/reports/report_config.yml", "output/reports/report_s
 # Save the resolved month-end cutoff alongside the observations used by this edition.
 yaml::write_yaml(config, snapshot_paths[1])
 # The edition snapshot contains only observations within its analysis cutoff.
-read_report_series(file_path = "data/final/report_series.csv") %>%
+read_report_series(file_path = "output/reports/report_series.csv") %>%
   filter(.data$date <= as.Date(config$params$data_cutoff)) %>%
   readr::write_csv(snapshot_paths[2])
 # Include editable sections and automated preparation in the edition's audit trail.

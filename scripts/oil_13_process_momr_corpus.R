@@ -129,7 +129,7 @@ write_csv(reconciliation, "data/interim/opec_corpus_reconciliation.csv")
 if (any(reconciliation$status == "error")) {
   rlang::abort("OPEC country rows do not reconcile with the published total", class = "opec_reconciliation_error")
 }
-write_csv(corpus, "data/processed/oil_13_momr_corpus.csv")
+write_csv(corpus, "data/final/oil_13_momr_corpus.csv")
 
 # Preserve published missing values in the newest vintage instead of carrying old values forward.
 latest <- corpus %>% arrange(.data$report_month) %>%
@@ -139,13 +139,13 @@ coverage <- latest %>% group_by(.data$source_type, .data$series_id, .data$displa
   summarise(first_date = min(.data$date), last_date = max(.data$date), observations = n(),
             reported = sum(.data$value_status == "reported"),
             expected_months = length(seq(min(.data$date), max(.data$date), by = "month")), .groups = "drop")
-write_csv(coverage, "data/final/oil_13_momr_coverage.csv")
+write_csv(coverage, "data/interim/oil_13_momr_coverage.csv")
 # Publish exact missing months separately from explicitly unreported numeric cells.
 gaps <- latest %>% group_by(.data$source_type, .data$series_id) %>%
   complete(date = seq(min(.data$date), max(.data$date), by = "month")) %>%
   filter(is.na(.data$report_month) | .data$value_status == "not_reported") %>%
   mutate(gap_type = if_else(is.na(.data$report_month), "no_observation", "reported_missing")) %>% ungroup()
-write_csv(gaps, "data/final/oil_13_momr_gaps.csv")
-write_csv(audit, "data/final/oil_13_momr_report_audit.csv")
+write_csv(gaps, "data/interim/oil_13_momr_gaps.csv")
+write_csv(audit, "data/interim/oil_13_momr_report_audit.csv")
 message(sprintf("Published %s observations; %s reports have documented retrieval gaps.",
                 nrow(latest), n_distinct(audit$report_month[audit$status == "unavailable_pdf"])))

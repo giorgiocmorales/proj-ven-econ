@@ -271,7 +271,8 @@ reserve_positions_interim <- reserve_positions %>%
     .data$source_file,
     .data$source_vintage,
     .data$source_priority,
-    .data$downloaded_at
+    .data$downloaded_at,
+    .data$source_file_modified_at
   )
 
 write_interim_dataset(reserve_positions_interim, dataset_id)

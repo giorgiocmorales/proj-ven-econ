@@ -12,9 +12,9 @@ dataset_id <- "monetary_01_mb_bcv"
 source_id <- "bcv"
 source_url <- "https://bcv.org.ve/sites/default/files/indicadores_sector_monetario/base_monetaria_semanal.xls"
 raw_path <- file.path("data", "raw", "bcv_mb.xls")
-offline <- identical(Sys.getenv("BCV_MONETARY_OFFLINE"), "true")
+offline <- identical(Sys.getenv("BCV_MONETARY_OFFLINE"), "true") ||
+  (source_acquisition_mode() != "update" && file.exists(raw_path))
 # An offline rebuild retains the raw workbook's retrieval time instead of inventing one.
-downloaded_at <- format(if (offline) file.info(raw_path)$mtime else Sys.time(), "%Y-%m-%d %H:%M:%S")
 
 if (!offline) download_latest_file(
   url = source_url,
@@ -22,6 +22,7 @@ if (!offline) download_latest_file(
   max_attempts = 3,
   timeout_seconds = 120
 )
+downloaded_at <- source_retrieval_time(raw_path, dataset_id)
 
 currency_regimes <- readr::read_csv(
   "registry/venezuela_currency_scales.csv",

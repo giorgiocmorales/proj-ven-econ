@@ -1,7 +1,11 @@
+# Build the financial data scope through explicit dependencies; report rendering is separate.
+library(dplyr)
 source("R/source_helpers.R")
-
-run_script_isolated("scripts/financial_01_download_bcv.R")
-run_script_isolated("scripts/financial_02_balances_bcv.R")
-run_script_isolated("scripts/financial_03_reserve_coefficients_bcv.R")
-run_script_isolated("scripts/financial_04_reserve_positions_bcv.R")
-run_script_isolated("scripts/financial_05_combine.R")
+source("R/data_contract_helpers.R")
+source("R/pipeline_helpers.R")
+arguments <- commandArgs(trailingOnly = TRUE)
+if (length(arguments) > 2L) {
+  rlang::abort("Supply a mode and, optionally, a failed run ID", class = "pipeline_arguments_error")
+}
+mode <- if (length(arguments)) arguments[[1]] else source_acquisition_mode()
+pipeline_run(target = "financial", mode = mode, parent_run = if (length(arguments) == 2L) arguments[[2]] else "")

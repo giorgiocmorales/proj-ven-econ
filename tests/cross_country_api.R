@@ -110,11 +110,14 @@ helper_env$download.file <- function(url, destfile, mode, quiet, method) {
 }
 preserved_path <- file.path(fixture_dir, "preserved_cache.json")
 writeLines("Previous cache", preserved_path)
+previous_mode <- getOption("pipeline.mode")
+options(pipeline.mode = "update")
 transport_error <- tryCatch(
   helper_env$download_latest_file("https://example.org", preserved_path, max_attempts = 1, timeout_seconds = 1),
   simpleError = function(e) conditionMessage(e)
 )
 stopifnot(grepl("Fixture transport failure", transport_error, fixed = TRUE),
           identical(readLines(preserved_path), "Previous cache"))
+options(pipeline.mode = previous_mode)
 setwd(project_dir)
 message("Cross-country API pagination, configuration, numeric checks, and runner failure propagation passed.")
