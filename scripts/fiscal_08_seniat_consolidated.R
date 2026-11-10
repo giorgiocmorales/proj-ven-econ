@@ -79,7 +79,10 @@ if (any(!is.finite(cells$value_bolivares_2021[!is.na(cells$value_bolivares_2021)
     any(cells$value_bolivares_2021 < 0, na.rm = TRUE)) {
   rlang::abort("Workbook nominal amounts are invalid", class = "seniat_workbook_amount_error")
 }
-workbook_totals <- cells %>% filter(.data$measure == "total_collection") %>%
+# Exclude workbook scaffolding beyond its reviewed window while allowing newer releases.
+workbook_cutoff <- as.Date("2026-09-01")
+release_cutoff <- max(baseline$date, workbook_cutoff)
+workbook_totals <- cells %>% filter(.data$measure == "total_collection", .data$date <= workbook_cutoff) %>%
   select(date, workbook_amount = value_bolivares_2021, source_file, source_sheet, source_cell, source_md5)
 supplied_totals <- supplied_cells %>% filter(.data$measure == "total_collection") %>%
   transmute(date, supplied_amount = value_bolivares_2021, supplied_source_file = source_file,
@@ -99,7 +102,7 @@ supplied_comparison <- supplied_totals %>% full_join(workbook_totals, by = "date
 comparison <- baseline %>% transmute(date, baseline_amount = value * 1e6,
     baseline_increment = normalized_increment, baseline_observation_id = observation_id,
     baseline_source_url = source_url, baseline_status = status) %>%
-  full_join(workbook_totals, by = "date") %>% filter(.data$date <= as.Date("2026-09-01")) %>%
+  full_join(workbook_totals, by = "date") %>% filter(.data$date <= release_cutoff) %>%
   mutate(difference_bolivares_2021 = .data$workbook_amount - .data$baseline_amount,
     numerical_allowance = .Machine$double.eps * pmax(abs(.data$workbook_amount),
       abs(.data$baseline_amount), 1, na.rm = TRUE) * 8,
@@ -118,7 +121,7 @@ monthly_evidence <- baseline %>% filter(!is.na(.data$value)) %>%
   bind_rows(review %>% filter(.data$measure == "total_collection") %>%
     mutate(evidence_id = review_id, evidence_status = "reviewed_release_correction", priority = 1L)) %>%
   arrange(.data$priority) %>% group_by(.data$date) %>% slice_head(n = 1) %>% ungroup()
-calendar <- tibble(date = seq(min(cells$date), as.Date("2026-09-01"), by = "month"))
+calendar <- tibble(date = seq(min(cells$date), release_cutoff, by = "month"))
 monthly <- calendar %>% left_join(workbook_totals, by = "date") %>%
   left_join(supplied_totals, by = "date") %>%
   left_join(monthly_evidence %>% select(-measure, -review_id), by = "date") %>%
@@ -142,7 +145,8 @@ monthly <- calendar %>% left_join(workbook_totals, by = "date") %>%
     conflict_status = case_when(.data$evidence_status == "reviewed_release_correction" ~
       "resolved_by_corroborated_release", .data$source_conflict ~ "alternative_values_retained",
       TRUE ~ "no_conflict_recorded"),
-    period_end = ceiling_date(.data$date, "month") - days(1), research_vintage = "2026-10-23")
+    period_end = ceiling_date(.data$date, "month") - days(1),
+    research_vintage = max(baseline$research_vintage))
 
 # Retain workbook components at their reported levels; never force them to match a chosen total.
 # Prefer a matching original formula over its pasted numeric copy so estimation provenance survives.
@@ -154,7 +158,7 @@ supplied_components <- supplied_cells %>% filter(.data$measure != "total_collect
         .Machine$double.eps * pmax(abs(.data$value_bolivares_2021), abs(.data$economia_amount), 1) * 16,
     priority = if_else(.data$matches_economia_amount & !is.na(.data$source_formula), 2.5, 4))
 component_candidates <- cells %>% filter(.data$measure != "total_collection", !is.na(.data$value_bolivares_2021),
-    .data$date <= as.Date("2026-09-01")) %>%
+    .data$date <= workbook_cutoff) %>%
   transmute(date, measure, value_bolivares_2021, source_id = "economia_a_c_workbook",
     source_file, source_sheet, source_cell, source_md5, source_url = NA_character_,
     evidence_type = "workbook_numeric_cell", evidence_id = paste0("WB-", .data$source_cell),

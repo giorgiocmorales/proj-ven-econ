@@ -147,7 +147,7 @@ Rscript scripts/run_report.R
 | --- | --- |
 | `rebuild` | Uses retained source bytes or explicitly identified legacy source extracts. Missing required cache fails. It never downloads. An ordinary rebuild leaves current raw files unchanged; an explicit failed-run continuation can publish source bytes already acquired in that failed run. |
 | `resume` | Reuses valid existing inputs and acquires missing known files/queries. This is the default for domain runners; it does not establish that the provider has no newer releases. |
-| `update` | Explicitly refreshes revisable sources. BCV monthly FX keeps validated historical months unless history refresh is requested; financial workbooks keep immutable historical releases; OPEC discovers releases and retains valid PDFs unless PDF refresh is requested. Single-file revisable workbooks/API snapshots can require complete new responses. |
+| `update` | Explicitly refreshes revisable sources. BCV monthly FX reuses validated historical exports with matching date windows unless history refresh is requested; financial workbooks keep immutable historical releases; OPEC discovers releases and retains valid PDFs unless PDF refresh is requested. Single-file revisable workbooks/API snapshots can require complete new responses. |
 | Dataset/domain selection | `run_data.R` accepts a registered dataset identity, declared output basename, step ID, domain or `all`. It resolves dependencies once and excludes unrelated branches. Domain runners accept an optional acquisition mode and use the same planner. |
 | Validation | `run_validate.R` checks current final-data contracts. An optional ISO date sets its freshness reference. The dataset runner records stale coverage separately from structural failures; reports still enforce their own freshness limits at the edition cutoff. |
 | Reporting | `run_report.R` audits availability, validates selected sources, assembles edition data, builds graphs and renders Word/PDF. It does not refresh Reuters or reconstruct GDP. Graph receipts cover declared graph inputs and selected report sources. |
@@ -515,6 +515,9 @@ quality flags and do not automatically replace canonical report inputs.
 - Offline checks: `Rscript --vanilla tests/weekly_inflation.R` verifies monthly reconstruction, leap-year/month lengths, mixed-month compounding, and daily CPI ratios.
 
 ## Continue on another device
+
+For the macro report outline and remaining editorial work, see
+[Venezuela macro report: structure and next steps](report/REPORT_STATUS.md).
 
 Inspect the current checkout and `config/report.yml` (or `REPORT_CONFIG`) instead
 of relying on a fixed handoff branch or cutoff. `R/report_inputs.R` derives the

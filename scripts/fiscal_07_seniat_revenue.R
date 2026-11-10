@@ -5,7 +5,7 @@ library(lubridate)
 source("R/source_helpers.R")
 ensure_project_dirs()
 dataset_id <- "fiscal_07_seniat_revenue"
-raw_dir <- "data/raw/seniat_revenue/research_2026-10-23"
+raw_dir <- "data/raw/seniat_revenue/research_2026-11-06"
 
 # Verify the immutable research vintage before reading any observations.
 manifest <- readr::read_csv(file.path(raw_dir, "manifest.csv"),
@@ -17,6 +17,16 @@ if (!all(file.exists(paths)) || anyDuplicated(manifest$file) ||
 }
 if (any(unname(tools::md5sum(paths)) != manifest$md5)) {
   rlang::abort("SENIAT archived research hashes changed", class = "seniat_source_integrity_error")
+}
+# Use the archived review window and preserve the original release dates.
+snapshot <- jsonlite::read_json(file.path(raw_dir, "snapshot.json"))
+start_date <- as.Date(snapshot$scope$start)
+end_date <- as.Date(snapshot$scope$end)
+review_date <- as.Date(snapshot$retrieved_on)
+if (length(start_date) != 1L || length(end_date) != 1L || length(review_date) != 1L ||
+    anyNA(c(start_date, end_date, review_date)) || start_date > end_date || end_date > review_date ||
+    start_date != floor_date(start_date, "month") || end_date != ceiling_date(end_date, "month") - days(1)) {
+  rlang::abort("Invalid SENIAT review window", class = "seniat_snapshot_error")
 }
 observations <- readr::read_csv(file.path(raw_dir, "reviewed_observations.csv"),
   col_types = cols(.default = col_character(), rounding_increment = col_double(),
@@ -53,7 +63,7 @@ observations <- observations %>% mutate(
   normalized_amount = .data$reported_amount / .data$monetary_divisor,
   normalized_increment = .data$rounding_increment / .data$monetary_divisor,
   normalized_currency = if_else(.data$currency_regime == "USD", "USD", "VES_2021"),
-  research_vintage = "2026-10-23")
+  research_vintage = as.character(review_date))
 eligible <- observations %>% filter(.data$eligible) %>%
   arrange(.data$source_rank, desc(.data$publication_date), .data$observation_id)
 selected <- eligible %>% group_by(.data$period_start, .data$period_end,
@@ -76,13 +86,13 @@ selected <- selected %>% left_join(flags,
   by = c("period_start", "period_end", "frequency", "measure", "normalized_currency"))
 
 # Create the full requested monthly calendar and retain missing observations as missing.
-calendar <- tibble(date = seq(as.Date("2019-01-01"), as.Date("2026-09-01"), by = "month"))
+calendar <- tibble(date = seq(start_date, floor_date(end_date, "month"), by = "month"))
 monthly <- calendar %>% left_join(selected %>%
     filter(.data$frequency == "monthly", .data$measure == "total_collection",
       .data$normalized_currency == "VES_2021"), by = c("date" = "period_start")) %>%
   mutate(period_end = ceiling_date(.data$date, "month") - days(1),
     value = .data$normalized_amount / 1e6, unit = "million_VES_2021",
-    source_id = "seniat", is_estimated = FALSE,
+    source_id = "seniat", is_estimated = FALSE, research_vintage = as.character(review_date),
     status = case_when(is.na(.data$observation_id) ~ "not_located",
       .data$source_rank <= 2 ~ "original_official_post",
       .data$source_rank <= 4 ~ "reproduced_release", TRUE ~ "secondary_compilation"),
@@ -91,7 +101,7 @@ monthly <- calendar %>% left_join(selected %>%
     observation_id, reported_value, currency_regime, monetary_divisor, normalized_increment,
     publication_date, publisher, source_rank, source_url, evidence_type, source_excerpt,
     candidate_count, quality_note, research_vintage)
-if (nrow(monthly) != 93L || anyDuplicated(monthly$date) ||
+if (nrow(monthly) != nrow(calendar) || anyDuplicated(monthly$date) ||
     any(monthly$value < 0, na.rm = TRUE) || any(!is.finite(monthly$value[!is.na(monthly$value)]))) {
   rlang::abort("Invalid SENIAT monthly calendar", class = "seniat_monthly_coverage_error")
 }
@@ -115,7 +125,7 @@ reconciliation <- aggregates %>% rowwise() %>% mutate(
       .data$normalized_increment + .Machine$double.eps * abs(.data$normalized_amount) * 16 ~
       "within_printed_increment_allowance", TRUE ~ "unresolved_difference")) %>% ungroup()
 gaps <- monthly %>% filter(is.na(.data$value)) %>% transmute(date, period_end,
-  status = "not_located_in_reviewed_sources", research_vintage = "2026-10-23",
+  status = "not_located_in_reviewed_sources", research_vintage = as.character(review_date),
   note = case_when(.data$date == as.Date("2020-04-01") ~
       "Contemporary commentary reports an omission; exact monthly total not recovered.",
     .data$date %in% as.Date(c("2026-04-01", "2026-07-01")) ~

@@ -24,11 +24,11 @@ monetary_01_mb_bcv,data/final/monetary_01_mb_bcv.csv,"dataset_id,source_id,date,
 monetary_02_liq_bcv,data/final/monetary_02_liq_bcv.csv,"dataset_id,source_id,date,frequency,variable_id,value,currency,unit,value_raw,source_currency,source_unit,conversion_factor,observation_currency_regime,source_file",variable_id|date,date,10000,30,,value
 monetary_03_multiplier_bcv,data/final/monetary_03_multiplier_bcv.csv,"dataset_id,source_id,date,frequency,variable_id,value,unit,liquidity,monetary_base,numerator_variable_id,denominator_variable_id",variable_id|date,date,1300,30,value|liquidity|monetary_base,value
 monetary_04_multiplier_annual_bcv,data/final/monetary_04_multiplier_annual_bcv.csv,"dataset_id,source_id,year,period_start,period_end,frequency,multiplier_start,multiplier_end,liquidity_contribution,base_contribution,multiplier_log_change,unit",year,period_end,20,400,,multiplier_end
-monetary_05_deposits_real_bcv,data/final/monetary_05_deposits_real_bcv.csv,"dataset_id,source_id,date,frequency,deposits_nominal_current_ves,cpi_reference_date,cpi_reference_value,currency,nominal_unit,real_unit,source_dataset_liquidity,source_dataset_cpi",date,date,250,120,deposits_nominal_current_ves,deposits_nominal_current_ves
+monetary_05_deposits_real_bcv,data/final/monetary_05_deposits_real_bcv.csv,"dataset_id,source_id,date,frequency,deposits_nominal_current_ves,cpi_reference_date,cpi_reference_value,currency,nominal_unit,real_unit,source_dataset_liquidity",date,date,250,120,deposits_nominal_current_ves,deposits_nominal_current_ves
 monetary_06_multiplier_detailed_annual_bcv,data/final/monetary_06_multiplier_detailed_annual_bcv.csv,"dataset_id,source_id,year,period_start,period_end,frequency,side,component_id,contribution,multiplier_log_change,unit,provisional",year|component_id,period_end,80,400,,contribution
 external_04_fx_yadio,data/final/external_04_fx_yadio.csv,date,date,date,1,730,,
 external_06_bop_q_bcv,data/final/external_06_bop_q_bcv.csv,"row_id,date",row_id|date,date,1,730,,
-external_07_res_bcv,data/final/external_07_res_bcv.csv,"sheet_name,row_id,col_name,date",sheet_name|row_id|col_name|date,date,1,730,,
+external_07_res_bcv,data/final/external_07_res_bcv.csv,"sheet_name,row_id,col_name,date,source_date_occurrence,source_date_repeated",sheet_name|date|source_date_occurrence|col_name,date,1,730,,
 external_09_res_wb,data/final/external_09_res_wb.csv,"target_variable,date",target_variable|date,date,1,730,,
 external_11_fx_sales_bcv,data/final/external_11_fx_sales_bcv.csv,"frequency,period_label,date",frequency|period_label,date,1,730,,
 external_11_fx_sales_bcv_aggregates,data/final/external_11_fx_sales_bcv_aggregates.csv,"frequency,period_label,date",frequency|period_label,date,1,730,,

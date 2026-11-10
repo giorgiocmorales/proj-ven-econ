@@ -79,12 +79,16 @@ import_bcv_fx <- function(source_url, view_selector, kind, raw_dir, processed_pa
   hashes <- unname(tools::md5sum(paths))
   reusable <- rep(FALSE, length(paths))
   if (nrow(previous) > 0L) {
-    reusable <- purrr::map2_lgl(paths, hashes, ~ any(previous$raw_file == .x & previous$raw_md5 == .y &
-      previous$status %in% c("downloaded", "cached"), na.rm = TRUE))
+    # A partial last-month export cannot satisfy a later, longer request.
+    reusable <- purrr::map_lgl(seq_along(paths), function(i) {
+      any(previous$raw_file == paths[[i]] & previous$raw_md5 == hashes[[i]] &
+        previous$export_url == requests[[i]]$url &
+        previous$status %in% c("downloaded", "cached"), na.rm = TRUE)
+    })
   }
   mode <- source_acquisition_mode()
   if (mode == "rebuild" && any(!reusable)) {
-    rlang::abort("Missing or checksum-mismatched BCV monthly cache", class = "bcv_fx_cache_error")
+    rlang::abort("Missing or mismatched BCV monthly cache for the requested window", class = "bcv_fx_cache_error")
   }
   fetch <- which(!reusable | (mode == "update" & (months == max(months) | refresh == "true")))
   staged <- paste0(paths[fetch], ".download")

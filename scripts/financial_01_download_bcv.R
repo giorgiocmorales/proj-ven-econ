@@ -11,7 +11,7 @@ source_registry <- readr::read_csv(
   show_col_types = FALSE
 )
 
-required_columns <- c("source_url", "raw_file")
+required_columns <- c("source_url", "raw_file", "vintage_label")
 missing_columns <- setdiff(required_columns, names(source_registry))
 
 if (length(missing_columns) > 0) {
@@ -22,11 +22,11 @@ if (length(missing_columns) > 0) {
 }
 
 purrr::pwalk(
-  source_registry %>% dplyr::select(.data$source_url, .data$raw_file),
-  function(source_url, raw_file) {
-    # Historical releases are immutable inputs; an explicit update refreshes current files.
+  source_registry %>% dplyr::select(.data$source_url, .data$raw_file, .data$vintage_label),
+  function(source_url, raw_file, vintage_label) {
+    # The full-history coefficient workbook is revisable, unlike fixed historical releases.
     if (source_acquisition_mode() == "update" && file.exists(raw_file) &&
-        !grepl("_current[.]", raw_file)) return(invisible(raw_file))
+        !vintage_label %in% c("current", "full_history")) return(invisible(raw_file))
     download_latest_file(
       url = source_url,
       dest_path = raw_file,

@@ -516,6 +516,16 @@ fetch_imf_indicator_set <- function(
           return(list(data = tibble::tibble(), error = tibble::tibble()))
         }
 
+        # The SDMX reader can return a series metadata row for a query with no observations.
+        if (!any(c("TIME_PERIOD", "OBS_VALUE") %in% names(df)) &&
+            !is.function(imf_reader) && file.exists(captured)) {
+          response <- xml2::read_xml(captured)
+          if (length(xml2::xml_find_all(response, ".//*[local-name()='Series']")) > 0L &&
+              length(xml2::xml_find_all(response, ".//*[local-name()='Obs']")) == 0L) {
+            return(list(data = tibble::tibble(), error = tibble::tibble()))
+          }
+        }
+
         df <- tibble::as_tibble(df) %>%
           dplyr::mutate(
             dataset_id = dataset_id,

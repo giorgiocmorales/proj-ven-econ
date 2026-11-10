@@ -11,7 +11,9 @@ ensure_project_dirs()
 dataset_id <- "monetary_05_deposits_real_bcv"
 liquidity_path <- "data/final/monetary_02_liq_bcv.csv"
 cpi_path <- "data/final/prices_01_cpi_bcv.csv"
-input_paths <- c(liquidity_path, cpi_path)
+grouped_cpi_path <- "data/final/prices_03_cpi_groups_bcv.csv"
+overlap_path <- "data/interim/prices_03_headline_overlap_check.csv"
+input_paths <- c(liquidity_path, cpi_path, grouped_cpi_path, overlap_path)
 missing_paths <- input_paths[!file.exists(input_paths)]
 
 if (length(missing_paths) > 0) {
@@ -48,9 +50,19 @@ if (max(abs(deposits_monthly$deposits_reconciliation_relative), na.rm = TRUE) > 
   stop("Deposit components do not reconcile to monetary liquidity less currency.", call. = FALSE)
 }
 
-# Join the official monthly CPI and express real deposits at the latest CPI level.
-cpi <- readr::read_csv(cpi_path, show_col_types = FALSE) %>%
-  dplyr::select(date = "date", cpi_index = "cpi_index", cpi_provisional = "provisional") %>%
+# Extend the original headline index with the grouped release after verifying the overlap.
+legacy_cpi <- readr::read_csv(cpi_path, show_col_types = FALSE)
+grouped_cpi <- readr::read_csv(grouped_cpi_path, show_col_types = FALSE) %>%
+  dplyr::filter(.data$series_id == "headline")
+overlap <- readr::read_csv(overlap_path, show_col_types = FALSE)
+if (nrow(overlap) == 0L || anyNA(overlap$agrees) || !all(overlap$agrees) ||
+    !identical(unique(c(legacy_cpi$unit, grouped_cpi$unit)), "index_dec_2007_100")) {
+  rlang::abort("BCV headline CPI releases do not agree on their overlapping base",
+    class = "deposit_cpi_overlap_error")
+}
+cpi <- dplyr::bind_rows(legacy_cpi, grouped_cpi %>%
+    dplyr::filter(.data$date > max(legacy_cpi$date))) %>%
+  dplyr::select(date, cpi_index, cpi_provisional = provisional, source_dataset_cpi = dataset_id) %>%
   dplyr::arrange(.data$date)
 
 if (anyDuplicated(cpi$date) > 0 || any(cpi$cpi_index <= 0, na.rm = TRUE)) {
@@ -76,8 +88,7 @@ deposits_final <- deposits_monthly %>%
     cpi_reference_date = cpi_reference$date[[1]],
     cpi_reference_value = cpi_reference$cpi_index[[1]],
     provisional = .data$provisional | dplyr::coalesce(.data$cpi_provisional, FALSE),
-    source_dataset_liquidity = "monetary_02_liq_bcv",
-    source_dataset_cpi = "prices_01_cpi_bcv"
+    source_dataset_liquidity = "monetary_02_liq_bcv"
   ) %>%
   dplyr::select(dplyr::all_of(c(
     "dataset_id", "source_id", "date", "frequency",
@@ -106,6 +117,11 @@ real_deposits <- deposits_final %>%
 
 if (nrow(real_deposits) < 150 || max(real_deposits$date) != cpi_reference$date[[1]]) {
   stop("Real deposit series has insufficient coverage or does not reach the CPI reference date.", call. = FALSE)
+}
+
+# Nominal-only months have no deflator source, while every real value must retain one.
+if (anyNA(real_deposits$source_dataset_cpi)) {
+  stop("Real deposit values are missing CPI source attribution.", call. = FALSE)
 }
 
 write_final_dataset(deposits_final, dataset_id)
