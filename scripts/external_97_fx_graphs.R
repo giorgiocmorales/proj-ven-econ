@@ -40,6 +40,7 @@ fx_1 <- fx_consolidated %>%
   geom_line(aes(y = rate_smc_adj, color = "TC oficial"), linewidth = 1) +
   geom_line(aes(y = rate_yad, color = "TC no-oficial"), linewidth = 1) +
   scale_color_manual(values = c("TC oficial" = "#003A5D", "TC no-oficial" = "#D70036")) +
+  geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
   scale_y_continuous(
     labels = scales::label_number(big.mark = ".", decimal.mark = ","),
     limits = c(NA, 900),
@@ -74,6 +75,7 @@ fx_2 <- fx_consolidated %>%
   geom_line(aes(y = rate_smc_adj, color = "TC oficial"), linewidth = 0.7) +
   geom_line(aes(y = rate_yad, color = "TC no-oficial"), linewidth = 0.7) +
   scale_color_manual(values = c("TC oficial" = "#003A5D", "TC no-oficial" = "#D70036")) +
+  geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
   scale_y_continuous(
     labels = scales::label_number(big.mark = ".", decimal.mark = ","),
     limits = c(0, 800),
@@ -140,6 +142,7 @@ fx_3 <- fx_consolidated %>%
   ggplot(aes(x = date)) +
   geom_line(aes(y = gap, color = "Brecha"), linewidth = 0.75, na.rm = TRUE) +
   scale_color_manual(values = c("Brecha" = "#003A5D")) +
+  geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
   scale_y_continuous(
     labels = scales::label_percent(accuracy = 0.1, decimal.mark = ","),
     limits = c(0, 1.5),

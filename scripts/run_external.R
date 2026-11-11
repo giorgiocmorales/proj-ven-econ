@@ -1,12 +1,11 @@
+# Build the external data scope through explicit dependencies; report rendering is separate.
+library(dplyr)
 source("R/source_helpers.R")
-
-run_script_isolated("scripts/external_01_fx_smc_bcv.R")
-run_script_isolated("scripts/external_02_fx_ind_bcv.R")
-run_script_isolated("scripts/external_03_fx_int_bcv.R")
-run_script_isolated("scripts/external_04_fx_yadio.R")
-run_script_isolated("scripts/external_95_fx_combine.R")
-run_script_isolated("scripts/external_05_bop_a_bcv.R")
-run_script_isolated("scripts/external_06_bop_q_bcv.R")
-run_script_isolated("scripts/external_07_res_bcv.R")
-run_script_isolated("scripts/external_08_res_imf.R")
-run_script_isolated("scripts/external_09_res_wb.R")
+source("R/data_contract_helpers.R")
+source("R/pipeline_helpers.R")
+arguments <- commandArgs(trailingOnly = TRUE)
+if (length(arguments) > 2L) {
+  rlang::abort("Supply a mode and, optionally, a failed run ID", class = "pipeline_arguments_error")
+}
+mode <- if (length(arguments)) arguments[[1]] else source_acquisition_mode()
+pipeline_run(target = "external", mode = mode, parent_run = if (length(arguments) == 2L) arguments[[2]] else "")

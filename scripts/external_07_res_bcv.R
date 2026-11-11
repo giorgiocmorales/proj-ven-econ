@@ -13,8 +13,8 @@ source_id <- "bcv"
 source_url <- "https://bcv.org.ve/sites/default/files/indicadores_sector_externo/2_1_1.xlsx"
 raw_path <- file.path("data", "raw", "bcv_reserves.xlsx")
 
-downloaded_at <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
 download_latest_file(source_url, raw_path)
+downloaded_at <- source_retrieval_time(raw_path, dataset_id)
 
 reserve_sheets <- bcv_excel_sheets(raw_path) %>%
   keep(~ str_detect(.x, "^\\d{4}$"))
@@ -36,7 +36,12 @@ reserves_raw <- map_dfr(reserve_sheets, function(sheet_name) {
       provisional = is_bcv_provisional(...1)
     ) %>%
     filter(!is.na(date)) %>%
-    select(row_id, date, provisional, all_of(currency_map$col_name)) %>%
+    # Keep duplicate dates in source order. Row positions shift when BCV adds new days.
+    group_by(date) %>%
+    mutate(source_date_occurrence = row_number(), source_date_repeated = n() > 1L) %>%
+    ungroup() %>%
+    select(row_id, date, source_date_occurrence, source_date_repeated,
+      provisional, all_of(currency_map$col_name)) %>%
     pivot_longer(
       cols = all_of(currency_map$col_name),
       names_to = "col_name",
@@ -57,4 +62,4 @@ reserves_raw <- map_dfr(reserve_sheets, function(sheet_name) {
     filter(!is.na(value))
 })
 
-write_processed_dataset(reserves_raw, dataset_id)
+write_final_dataset(reserves_raw, dataset_id)

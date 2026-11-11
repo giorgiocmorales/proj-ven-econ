@@ -51,10 +51,10 @@ theme_emw <- function(base_family = ven_chart_specs$base_family, base_size = 8) 
     theme(
       axis.title = element_blank(),
       panel.border = element_blank(),
-      axis.line.x = element_line(color = "grey30", linewidth = 0.5),
-      axis.line.y = element_line(color = "grey30", linewidth = 0.5),
-      axis.ticks = element_line(color = "grey30", linewidth = 0.5),
-      axis.ticks.length = unit(-2.5, "pt")
+      axis.line.x = element_line(color = "#2b3033", linewidth = 0.35, linetype = "solid"),
+      axis.line.y = element_line(color = "#2b3033", linewidth = 0.35, linetype = "solid"),
+      axis.ticks = element_blank(),
+      axis.ticks.length = unit(0, "pt")
     )
 }
 
@@ -117,12 +117,12 @@ p1 <- ggplot(p1_rates, aes(x = date)) +
   ) +
   
   # Y axis
+  geom_hline(yintercept = 0, color = "#687179", linewidth = 0.25, linetype = "solid") +
   scale_y_continuous(
     limits = c(0, 800),
     breaks = seq(0, 800, by = 100),
     labels = label_number(big.mark = ","),
     expand = c(0, 0),
-    
     sec.axis = sec_axis(
       transform = ~ rate_to_gap(.),
       breaks = seq(gap_min, gap_max, by = 0.20),

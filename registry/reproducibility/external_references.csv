@@ -1,0 +1,24 @@
+evidence_file,line,literal,evidence_kind,exists,sha256
+data/raw/cross_country_macro/wb_ccdfs_metadata.json,7998,"o:\nShare — copy and redistribute the material in any medium or format for any purpose, even commercially.\nAdapt — remix, transform, and build upon the material for any purpose, even commercially.\nThe licensor cannot revoke these freedoms as long as you follow the license terms.\nUnder the following terms:\nAttribution — You must give appropriate credit , provide a link to the license, and indicate if changes were made . You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.\nNo additional restrictions — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.\nNotices:\nWhen the Licensor is an intergovernmental organization, disputes will be resolved by mediation and arbitration unless otherwise agreed.\n\nYou do not have to comply with the license for elements of the material in the public domain or where your use is permitted by an applicable exception or limitation.\n\nNo warranties are given. The license may not give you all of the permissions necessary for your intended use. For example, other rights such as publicity, privacy, or moral rights may limit how you use the material.\n",external_local_reference,FALSE,NA
+data/raw/opec/2026-10/download_receipt.csv,2,D:/Downloads/OPEC_MOMR_October_2026.pdf,external_local_reference,TRUE,7f8f37be6bdf4b1135b993a22f1e6029a6736f985372ca792d23050dba00cc29
+data/raw/seniat_revenue/research_2026-10-23/seniat_research_03.txt,191,p:// ... Concentrar en el Tesoro Nacional la recaudación de tasas y contribuciones especiales.,external_local_reference,FALSE,NA
+data/raw/seniat_revenue/research_2026-10-23/seniat_research_16.txt,324,s://,external_local_reference,FALSE,NA
+data/raw/seniat_revenue/user_workbook/snapshot.json,3,D:/Downloads/Recaudación Seniat.xlsx,external_local_reference,TRUE,0c4b8247365261c1eca06e4f9df9bc9e661f49658cf708c5bbe88c2e9bda4972
+data/raw/seniat_revenue/user_workbook/snapshot_9ccc05e3.json,3,D:/Downloads/Recaudación Seniat.xlsx,external_local_reference,TRUE,0c4b8247365261c1eca06e4f9df9bc9e661f49658cf708c5bbe88c2e9bda4972
+references/forecasting_course_review.md,9,D:\Documents\2_Educación\Cursos en Línea\edX\IMFx\MFx Macroeconometric Forecasting),external_local_reference,FALSE,NA
+references/forecasting_course_review.md,10,D:\Documents\2_Educación\Cursos en Línea\DataCamp\Quantitative Analyst in R Career Track),external_local_reference,FALSE,NA
+references/forecasting_course_review.md,71,D:\Documents\6_Data Science\Portfolio\proj-ven-econ\scripts\external_100_fx_arima.R),external_local_reference,FALSE,NA
+references/forecasting_course_review.md,72,D:\Documents\6_Data Science\Portfolio\proj-ven-econ\outputs\forecasts\fx_arima\backtest_metrics.csv),external_local_reference,FALSE,NA
+references/forecasting_course_review.md,73,D:\Documents\6_Data Science\Portfolio\proj-ven-econ\outputs\forecasts\fx_arima\model_diagnostics.csv),external_local_reference,FALSE,NA
+registry/wb_indicator_catalog.csv,13746,p://mospi.nic.in/mospi_new/upload/SYB2014/CH-12-IRRIGATION/Table 12.2.xls,external_local_reference,FALSE,NA
+registry/wb_indicator_catalog.csv,13794,p://mospi.nic.in/mospi_new/upload/SYB2014/CH-16-ENERGY/Table 16.12.xls,external_local_reference,FALSE,NA
+registry/wb_indicator_catalog.csv,13804,p://mospi.nic.in/mospi_new/upload/SYB2014/CH-16-RURAL AND URBAN DEVELOPMENT/Table 35.12.xls,external_local_reference,FALSE,NA
+registry/wb_indicator_catalog.csv,13808,p://mospi.nic.in/mospi_new/upload/SYB2014/CH-16-ENERGY/Table 16.14.xls,external_local_reference,FALSE,NA
+registry/wb_indicator_catalog.csv,14048,p://mospi.nic.in/mospi_new/upload/SYB2014/CH-21-ROADS/Table 21.5.xls,external_local_reference,FALSE,NA
+scripts/oil_14_audit_direct_history.R,10,D:/Documents/3_Trabajos/Matar Tigres/Angel/Economia_A_C.xlsx,external_local_reference,TRUE,e6154cf91a76f5272647c789a59e7c2842df14aa7e3a6f6e7876b40d8010d6b3
+tests/opec_downloads.R,44,e://,external_local_reference,TRUE,NA
+tests/reproducibility.R,53,D:/baseline.csv,external_local_reference,FALSE,NA
+tmp/inspect_manual_oil.R,2,D:/Documents/3_Trabajos/Matar Tigres/Angel/Economia_A_C.xlsx,external_local_reference,TRUE,e6154cf91a76f5272647c789a59e7c2842df14aa7e3a6f6e7876b40d8010d6b3
+tmp/missing_price.R,6,S:\n,external_local_reference,FALSE,NA
+tmp/opec_breakpoint_check.R,8,D:/Downloads/opec_momr_target_section_scan.csv,external_local_reference,TRUE,85822739f2fb374c40212b84a0a546dbb16ad439928a86c16280742fb6d6c1b7
+tmp/report-scaffold/artifact.md,1,D:\Documents\6_Data Science\Portfolio\proj-ven-econ\report\templates\estevez_format.docx,external_local_reference,TRUE,f3e35362bcd50ab313f912da108fbd5b3b8496b568b971edb9abf9a7bff8160c

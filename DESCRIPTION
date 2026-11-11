@@ -7,8 +7,10 @@ Encoding: UTF-8
 Depends:
     R (>= 4.2)
 Imports:
+    digest,
     dplyr,
     egg,
+    forecast,
     ggplot2,
     glue,
     grid,
@@ -16,13 +18,16 @@ Imports:
     httr,
     httr2,
     jsonlite,
+    knitr,
     lubridate,
-    openxlsx,
     pdftools,
     purrr,
+    qpdf,
     ragg,
     readr,
     readxl,
+    rlang,
+    rmarkdown,
     rsdmx,
     rvest,
     scales,
@@ -31,4 +36,5 @@ Imports:
     tibble,
     tidyr,
     tidyverse,
-    xml2
+    xml2,
+    yaml
